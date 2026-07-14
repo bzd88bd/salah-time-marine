@@ -1,1 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>Salah Time - Marine Edition</title>
+
+    <meta name="description"
+        content="Offline Prayer Time App for iPhone and Seafarers">
+
+    <meta name="theme-color" content="#0A4D68">
+
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent">
+    <meta name="apple-mobile-web-app-title"
+        content="Salah Time">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+
+<h1>🕌 Salah Time</h1>
+
+<p id="location">Locating...</p>
+
+<p id="todayDate"></p>
+
+</header>
+
+
+<section class="nextPrayer">
+
+<h2>Next Prayer</h2>
+
+<div id="nextPrayerName">
+
+Loading...
+
+</div>
+
+<div id="countdown">
+
+00:00:00
+
+</div>
+
+</section>
+
+
+<section class="prayerCard">
+
+<div class="row">
+
+<span>Fajr</span>
+
+<span id="fajr">--:--</span>
+
+</div>
+
+<div class="row">
+
+<span>Sunrise</span>
+
+<span id="sunrise">--:--</span>
+
+</div>
+
+<div class="row">
+
+<span>Dhuhr</span>
+
+<span id="dhuhr">--:--</span>
+
+</div>
+
+<div class="row">
+
+<span>Asr</span>
+
+<span id="asr">--:--</span>
+
+</div>
+
+<div class="row">
+
+<span>Maghrib</span>
+
+<span id="maghrib">--:--</span>
+
+</div>
+
+<div class="row">
+
+<span>Isha</span>
+
+<span id="isha">--:--</span>
+
+</div>
+
+</section>
+
+
+<section class="info">
+
+<div class="infoBox">
+
+<h3>Hijri Date</h3>
+
+<p id="hijriDate">
+
+Loading...
+
+</p>
+
+</div>
+
+<div class="infoBox">
+
+<h3>Calculation</h3>
+
+<p id="calculationMethod">
+
+Loading...
+
+</p>
+
+</div>
+
+<div class="infoBox">
+
+<h3>Asr Method</h3>
+
+<p id="asrMethod">
+
+Hanafi
+
+</p>
+
+</div>
+
+</section>
+
+
+<section class="actions">
+
+<button id="refreshLocation">
+
+Refresh Location
+
+</button>
+
+<button id="openQibla">
+
+Qibla Compass
+
+</button>
+
+<button id="openSettings">
+
+Settings
+
+</button>
+
+</section>
+
+
+<footer>
+
+<p>
+Salah Time – Marine Edition<br>
+Version 1.0.0
+</p>
+
+</footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/adhan.min.js"></script>
+<script src="app.js"></script>
+
+</body>
+
+</html>
