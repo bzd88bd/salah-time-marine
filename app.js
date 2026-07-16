@@ -624,65 +624,44 @@ function updateCountdown() {
 
     if (!STATE.nextPrayer) return;
 
-
     const now = new Date();
 
+    let diff = STATE.nextPrayer.time.getTime() - now.getTime();
 
-    let difference =
+    if (diff <= 0) {
 
-        STATE.nextPrayer.time - now;
+        findNextPrayer();
 
-
-    if (difference < 0) {
-
-        difference = 0;
+        diff = STATE.nextPrayer.time.getTime() - new Date().getTime();
 
     }
 
+    const hours = Math.floor(diff / 3600000);
 
-    const hours =
+    const minutes = Math.floor((diff % 3600000) / 60000);
 
-        Math.floor(
-            difference / 3600000
-        );
-
-
-    const minutes =
-
-        Math.floor(
-            (difference % 3600000) / 60000
-        );
-
-
-    const seconds =
-
-        Math.floor(
-            (difference % 60000) / 1000
-        );
-
+    const seconds = Math.floor((diff % 60000) / 1000);
 
     ui.countdown.textContent =
-
-        `${String(hours).padStart(2,"0")}:` +
-
-        `${String(minutes).padStart(2,"0")}:` +
-
-        `${String(seconds).padStart(2,"0")}`;
+        `${String(hours).padStart(2, "0")}:` +
+        `${String(minutes).padStart(2, "0")}:` +
+        `${String(seconds).padStart(2, "0")}`;
 
 }
-
 
 function startCountdown() {
 
     updateCountdown();
 
-    setInterval(
-        updateCountdown,
-        1000
-    );
+    if (window.countdownTimer) {
+
+        clearInterval(window.countdownTimer);
+
+    }
+
+    window.countdownTimer = setInterval(updateCountdown, 1000);
 
 }
-
 
 /* ================================================
    Hijri Date
