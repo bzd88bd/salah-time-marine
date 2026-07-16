@@ -121,20 +121,26 @@ async function initializeApp() {
 
     try {
 
-        await getCurrentLocation();
+    await getCurrentLocation();
 
-        updateLocationInfo();
+    updateLocationInfo();
 
-    }
+    calculatePrayerTimes();
 
-    catch (err) {
+    updateHijriDate();
 
-        console.error(err);
+    startCountdown();
 
-        ui.location.textContent =
-            "Location unavailable";
+}
 
-    }
+catch (err) {
+
+    console.error(err);
+
+    ui.location.textContent =
+        "Location unavailable";
+
+}
 
 }
 
@@ -716,49 +722,5 @@ if (refreshButton) {
     );
 
 }
-
-
-/* ================================================
-   Complete Startup
-================================================ */
-
-async function startPrayerCalculation(){
-
-    if (
-        STATE.latitude === null ||
-        STATE.longitude === null
-    ) {
-
-        return;
-
-    }
-
-
-    calculatePrayerTimes();
-
-    updateHijriDate();
-
-}
-
-
-const originalInitializeApp = initializeApp;
-
-
-initializeApp = async function(){
-
-    await originalInitializeApp();
-
-    await startPrayerCalculation();
-
-};
-
-
-
-
-
-
-
-
-
 
 
