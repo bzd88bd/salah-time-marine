@@ -57,6 +57,14 @@ const ui = {
 
     location:
         document.getElementById("location"),
+   position:
+    document.getElementById("position"),
+
+localTime:
+    document.getElementById("localTime"),
+
+timeZone:
+    document.getElementById("timeZone"),
 
     todayDate:
         document.getElementById("todayDate"),
@@ -115,6 +123,9 @@ async function initializeApp() {
     loadSettings();
 
     updateTodayDate();
+   updateShipTime();
+
+setInterval(updateShipTime, 1000);
 
     ui.asrMethod.textContent =
         APP.asrMethod;
@@ -286,31 +297,29 @@ async function reverseGeocode() {
 
 function updateLocationInfo() {
 
-    if (STATE.city) {
+    if (ui.position && STATE.latitude !== null) {
 
-        ui.location.textContent =
-
-            `${STATE.city}, ${STATE.country}`;
+        ui.position.textContent =
+            `${STATE.latitude.toFixed(4)}, ${STATE.longitude.toFixed(4)}`;
 
     }
 
-    else if (STATE.country) {
+
+    if (STATE.city || STATE.country) {
 
         ui.location.textContent =
-            STATE.country;
+            `${STATE.city}, ${STATE.country}`;
 
     }
 
     else {
 
         ui.location.textContent =
-
-            `${STATE.latitude.toFixed(4)}, ${STATE.longitude.toFixed(4)}`;
+            "Unknown Location";
 
     }
 
 }
-
 
 
 
@@ -467,7 +476,61 @@ function updateTodayDate() {
         );
 
 }
+function updateShipTime() {
 
+    const now = new Date();
+
+
+    if (ui.localTime) {
+
+        ui.localTime.textContent =
+            now.toLocaleTimeString([], {
+
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false
+
+            });
+
+    }
+
+
+    if (ui.timeZone) {
+
+        const tz =
+            STATE.timezone ||
+            Intl.DateTimeFormat()
+            .resolvedOptions()
+            .timeZone;
+
+
+        const offset =
+            -now.getTimezoneOffset();
+
+
+        const sign =
+            offset >= 0 ? "+" : "-";
+
+
+        const hours =
+            String(
+                Math.floor(Math.abs(offset) / 60)
+            ).padStart(2,"0");
+
+
+        const minutes =
+            String(
+                Math.abs(offset) % 60
+            ).padStart(2,"0");
+
+
+        ui.timeZone.textContent =
+            `${tz} (UTC${sign}${hours}:${minutes})`;
+
+    }
+
+}
 
 /* ================================================
    Prayer Table
