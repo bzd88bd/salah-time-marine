@@ -413,7 +413,11 @@ button:focus{
 
 
 
-
+.remainingLabel{
+    font-size:14px;
+    margin-top:8px;
+    opacity:0.7;
+}
 
 
 
