@@ -263,25 +263,47 @@ async function reverseGeocode() {
 
         );
 
-        const data =
-            await response.json();
+
+        const data = await response.json();
+
+
+        const address = data.address || {};
+
 
         STATE.country =
-            data.address.country || "";
+            address.country || "";
+
 
         STATE.city =
 
-            data.address.city ||
+            address.city ||
 
-            data.address.town ||
+            address.town ||
 
-            data.address.village ||
+            address.village ||
+
+            address.municipality ||
+
+            address.county ||
+
+            address.state ||
 
             "";
 
+
+        if (!STATE.city && data.display_name) {
+
+            STATE.city =
+                data.display_name.split(",")[0];
+
+        }
+
+
     }
 
-    catch {
+    catch(error) {
+
+        console.error(error);
 
         STATE.country = "";
 
@@ -290,7 +312,6 @@ async function reverseGeocode() {
     }
 
 }
-
 /* ================================================
    Update Location
 ================================================ */
