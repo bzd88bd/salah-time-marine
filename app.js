@@ -523,76 +523,86 @@ function updatePrayerTable() {
 
 function findNextPrayer() {
 
-    const now = new Date();
+    if (!STATE.prayerTimes) return;
 
+    const now = new Date();
 
     const prayers = [
 
         {
-            name:"Fajr",
-            time:STATE.prayerTimes.fajr
+            name: "Fajr",
+            time: STATE.prayerTimes.fajr
         },
 
         {
-            name:"Dhuhr",
-            time:STATE.prayerTimes.dhuhr
+            name: "Sunrise",
+            time: STATE.prayerTimes.sunrise
         },
 
         {
-            name:"Asr",
-            time:STATE.prayerTimes.asr
+            name: "Dhuhr",
+            time: STATE.prayerTimes.dhuhr
         },
 
         {
-            name:"Maghrib",
-            time:STATE.prayerTimes.maghrib
+            name: "Asr",
+            time: STATE.prayerTimes.asr
         },
 
         {
-            name:"Isha",
-            time:STATE.prayerTimes.isha
+            name: "Maghrib",
+            time: STATE.prayerTimes.maghrib
+        },
+
+        {
+            name: "Isha",
+            time: STATE.prayerTimes.isha
         }
 
     ];
 
+    for (let prayer of prayers) {
 
-    STATE.nextPrayer = null;
-
-
-    for (const prayer of prayers) {
-
-
-        if (prayer.time > now) {
+        if (now < prayer.time) {
 
             STATE.nextPrayer = prayer;
 
-            break;
+            updateNextPrayer();
+
+            return;
 
         }
 
     }
 
+    // Tomorrow's Fajr
 
-    if (!STATE.nextPrayer) {
+    const tomorrow = new Date();
 
-        STATE.nextPrayer = {
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
-            name:"Fajr",
+    const coordinates = new adhan.Coordinates(
+        STATE.latitude,
+        STATE.longitude
+    );
 
-            time:STATE.prayerTimes.fajr
+    const tomorrowPrayer = new adhan.PrayerTimes(
+        coordinates,
+        tomorrow,
+        createCalculationParameters()
+    );
 
-        };
+    STATE.nextPrayer = {
 
-    }
+        name: "Fajr",
 
+        time: tomorrowPrayer.fajr
+
+    };
 
     updateNextPrayer();
 
-    startCountdown();
-
 }
-
-
 function updateNextPrayer() {
 
     if (!STATE.nextPrayer) return;
