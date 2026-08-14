@@ -327,19 +327,103 @@ Settings
     </div>
 
 
-    <!-- Prayer Adjustment -->
+    <!-- Prayer Time Adjustment -->
 
-    <div class="settingItem">
+<div class="settingItem">
 
-        <label>
-            ⏱ Prayer Time Adjustment
-        </label>
+    <label>
+        ⏱ Prayer Time Adjustment
+    </label>
 
-        <p class="settingDescription">
-            Manual adjustment will be added in a later update.
-        </p>
+    <div class="adjustmentGrid">
+
+        <div class="adjustmentRow">
+            <span>Fajr</span>
+
+            <button type="button"
+                    onclick="changePrayerAdjustment('fajr', -1)">
+                −
+            </button>
+
+            <span id="adjustFajr">0 min</span>
+
+            <button type="button"
+                    onclick="changePrayerAdjustment('fajr', 1)">
+                +
+            </button>
+        </div>
+
+
+        <div class="adjustmentRow">
+            <span>Dhuhr</span>
+
+            <button type="button"
+                    onclick="changePrayerAdjustment('dhuhr', -1)">
+                −
+            </button>
+
+            <span id="adjustDhuhr">0 min</span>
+
+            <button type="button"
+                    onclick="changePrayerAdjustment('dhuhr', 1)">
+                +
+            </button>
+        </div>
+
+
+        <div class="adjustmentRow">
+            <span>Asr</span>
+
+            <button type="button"
+                    onclick="changePrayerAdjustment('asr', -1)">
+                −
+            </button>
+
+            <span id="adjustAsr">0 min</span>
+
+            <button type="button"
+                    onclick="changePrayerAdjustment('asr', 1)">
+                +
+            </button>
+        </div>
+
+
+        <div class="adjustmentRow">
+            <span>Maghrib</span>
+
+            <button type="button"
+                    onclick="changePrayerAdjustment('maghrib', -1)">
+                −
+            </button>
+
+            <span id="adjustMaghrib">0 min</span>
+
+            <button type="button"
+                    onclick="changePrayerAdjustment('maghrib', 1)">
+                +
+            </button>
+        </div>
+
+
+        <div class="adjustmentRow">
+            <span>Isha</span>
+
+            <button type="button"
+                    onclick="changePrayerAdjustment('isha', -1)">
+                −
+            </button>
+
+            <span id="adjustIsha">0 min</span>
+
+            <button type="button"
+                    onclick="changePrayerAdjustment('isha', 1)">
+                +
+            </button>
+        </div>
 
     </div>
+
+</div>
 
 
     <!-- Save -->
