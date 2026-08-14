@@ -655,7 +655,9 @@ button:focus{
 
     position: absolute;
 
-    font-size: 42px;
+    font-size: 58px;
+
+    font-weight: bold;
 
     transform-origin: center center;
 
