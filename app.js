@@ -745,11 +745,6 @@ function findNextPrayer() {
 
 }
 
-console.log("NOW:", new Date());
-console.log("FAJR:", STATE.prayerTimes.fajr);
-console.log("DHUHR:", STATE.prayerTimes.dhuhr);
-console.log("ASR:", STATE.prayerTimes.asr);
-console.log("ISHA:", STATE.prayerTimes.isha);
 
 function updateNextPrayer() {
 
