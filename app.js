@@ -948,35 +948,26 @@ if (closeSettingsButton) {
 function loadSettingsIntoUI() {
 
     if (calculationSelect) {
-
         calculationSelect.value =
             APP.calculationMethod;
-
     }
-
 
     if (asrSelect) {
-
         asrSelect.value =
             APP.asrMethod;
-
     }
-
 
     if (timeFormatSelect) {
-
         timeFormatSelect.value =
             String(APP.timeFormat);
-
     }
-
 
     if (autoLocationToggle) {
-
         autoLocationToggle.checked =
             APP.autoLocation;
-
     }
+
+    loadAdjustmentSettings();
 
 }
 
