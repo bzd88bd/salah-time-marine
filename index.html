@@ -207,6 +207,82 @@ Qibla Compass
 
 </button>
 
+<!-- =========================================
+     Qibla Compass - Version 1.4
+========================================= -->
+
+<section id="qiblaPanel" class="qiblaPanel">
+
+    <div class="qiblaHeader">
+
+        <h2>🧭 Qibla Compass</h2>
+
+        <button id="closeQibla" class="closeButton">
+            ✕
+        </button>
+
+    </div>
+
+    <div class="qiblaCompass">
+
+        <div class="compassCircle">
+
+            <div class="compassDirection north">
+                N
+            </div>
+
+            <div class="compassDirection east">
+                E
+            </div>
+
+            <div class="compassDirection south">
+                S
+            </div>
+
+            <div class="compassDirection west">
+                W
+            </div>
+
+            <div id="qiblaArrow" class="qiblaArrow">
+                🕋
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="qiblaInfo">
+
+        <p>
+            Qibla Bearing
+        </p>
+
+        <strong id="qiblaBearing">
+            --°
+        </strong>
+
+        <p>
+            Current Heading
+        </p>
+
+        <strong id="currentHeading">
+            --°
+        </strong>
+
+    </div>
+
+    <p id="qiblaStatus" class="qiblaStatus">
+        Waiting for compass...
+    </p>
+
+    <button id="enableCompass" class="saveSettingsButton">
+        Enable Compass
+    </button>
+
+</section>
+
+
+    
 <button id="openSettings" onclick="openSettingsPanel()">
 
 Settings
