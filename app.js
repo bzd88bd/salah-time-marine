@@ -1612,13 +1612,12 @@ function handleCompass(event) {
     let heading = null;
 
 
-    /*
-     * iPhone / iOS
-     */
+    /* ============================================
+       iPhone / iOS Compass
+    ============================================ */
 
     if (
-        typeof event.webkitCompassHeading ===
-        "number"
+        typeof event.webkitCompassHeading === "number"
     ) {
 
         heading =
@@ -1627,9 +1626,9 @@ function handleCompass(event) {
     }
 
 
-    /*
-     * Other browsers
-     */
+    /* ============================================
+       Other Devices
+    ============================================ */
 
     else if (
         typeof event.alpha === "number"
@@ -1648,6 +1647,10 @@ function handleCompass(event) {
         (heading + 360) % 360;
 
 
+    /* ============================================
+       Display Current Heading
+    ============================================ */
+
     if (currentHeadingDisplay) {
 
         currentHeadingDisplay.textContent =
@@ -1656,23 +1659,46 @@ function handleCompass(event) {
     }
 
 
-    /*
-     * Rotate Qibla arrow relative
-     * to current phone heading.
-     */
+    /* ============================================
+       Rotate Compass Dial
+       
+       N / E / S / W will now follow
+       the phone's physical orientation.
+    ============================================ */
 
-    if (
-        qiblaArrow &&
-        qiblaBearing !== null
-    ) {
+    const compassCircle =
+        document.querySelector(".compassCircle");
 
-        const rotation =
-            qiblaBearing - heading;
+    if (compassCircle) {
 
-        qiblaArrow.style.transform =
-            `rotate(${rotation}deg)`;
+        compassCircle.style.transform =
+            `rotate(${-heading}deg)`;
 
     }
+
+
+    /* ============================================
+       Keep Qibla Arrow Independent
+       
+       Arrow always points toward Qibla.
+    ============================================ */
+
+    /* ============================================
+   Qibla Arrow
+============================================ */
+
+if (
+    qiblaArrow &&
+    qiblaBearing !== null
+) {
+
+    const qiblaRotation =
+        qiblaBearing + heading;
+
+    qiblaArrow.style.transform =
+        `rotate(${qiblaRotation}deg)`;
+
+}
 
 }
 
