@@ -469,26 +469,19 @@ function createCalculationParameters() {
 function calculatePrayerTimes() {
 
     const coordinates =
-
         new adhan.Coordinates(
-
             STATE.latitude,
-
             STATE.longitude
-
         );
 
     STATE.prayerTimes =
-
         new adhan.PrayerTimes(
-
             coordinates,
-
             new Date(),
-
             createCalculationParameters()
-
         );
+
+    applyPrayerAdjustments();
 
     updatePrayerTable();
 
@@ -497,7 +490,6 @@ function calculatePrayerTimes() {
     updateCalculationInfo();
 
 }
-
 function updateCalculationInfo() {
 
     ui.calculation.textContent =
@@ -1207,6 +1199,132 @@ function saveSettingsPanel() {
     alert("Settings saved successfully.");
 
 }
+
+
+/* ================================================
+   Prayer Time Adjustment
+   Version 1.3.1
+================================================ */
+
+function changePrayerAdjustment(prayer, amount) {
+
+    if (!APP.prayerAdjustment) {
+
+        APP.prayerAdjustment = {
+            fajr: 0,
+            dhuhr: 0,
+            asr: 0,
+            maghrib: 0,
+            isha: 0
+        };
+
+    }
+
+    APP.prayerAdjustment[prayer] =
+        Number(APP.prayerAdjustment[prayer] || 0)
+        + amount;
+
+    updateAdjustmentDisplay(prayer);
+
+}
+
+
+/* ================================================
+   Adjustment Display
+================================================ */
+
+function updateAdjustmentDisplay(prayer) {
+
+    const element =
+        document.getElementById(
+            "adjust" +
+            prayer.charAt(0).toUpperCase() +
+            prayer.slice(1)
+        );
+
+    if (!element) return;
+
+    const value =
+        Number(APP.prayerAdjustment[prayer] || 0);
+
+    element.textContent =
+        value > 0
+            ? `+${value} min`
+            : `${value} min`;
+
+}
+
+
+/* ================================================
+   Load Adjustment Values
+================================================ */
+
+function loadAdjustmentSettings() {
+
+    if (!APP.prayerAdjustment) {
+
+        APP.prayerAdjustment = {
+
+            fajr: 0,
+            dhuhr: 0,
+            asr: 0,
+            maghrib: 0,
+            isha: 0
+
+        };
+
+    }
+
+    [
+        "fajr",
+        "dhuhr",
+        "asr",
+        "maghrib",
+        "isha"
+
+    ].forEach(updateAdjustmentDisplay);
+
+}
+
+
+/* ================================================
+   Apply Adjustments
+================================================ */
+
+function applyPrayerAdjustments() {
+
+    if (!STATE.prayerTimes) return;
+
+    const adjustments =
+        APP.prayerAdjustment || {};
+
+    [
+        "fajr",
+        "dhuhr",
+        "asr",
+        "maghrib",
+        "isha"
+
+    ].forEach(prayer => {
+
+        const minutes =
+            Number(adjustments[prayer]) || 0;
+
+        if (minutes === 0) return;
+
+        STATE.prayerTimes[prayer] =
+            new Date(
+                STATE.prayerTimes[prayer].getTime()
+                +
+                minutes * 60000
+            );
+
+    });
+
+}
+
+
+
 
 
 
