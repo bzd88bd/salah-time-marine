@@ -1205,6 +1205,7 @@ function saveSettingsPanel() {
     ) {
 
         calculatePrayerTimes();
+       updateQiblaBearing();
 
         updateHijriDate();
 
@@ -1353,6 +1354,339 @@ function applyPrayerAdjustments() {
     });
 
 }
+
+
+
+/* ================================================
+   Version 1.4 - Qibla Compass
+================================================ */
+
+const qiblaPanel =
+    document.getElementById("qiblaPanel");
+
+const openQiblaButton =
+    document.getElementById("openQibla");
+
+const closeQiblaButton =
+    document.getElementById("closeQibla");
+
+const enableCompassButton =
+    document.getElementById("enableCompass");
+
+const qiblaBearingDisplay =
+    document.getElementById("qiblaBearing");
+
+const currentHeadingDisplay =
+    document.getElementById("currentHeading");
+
+const qiblaArrow =
+    document.getElementById("qiblaArrow");
+
+const qiblaStatus =
+    document.getElementById("qiblaStatus");
+
+
+let qiblaBearing = null;
+let compassEnabled = false;
+
+
+/* ================================================
+   Kaaba Coordinates
+================================================ */
+
+const KAABA_LATITUDE =
+    21.422487;
+
+const KAABA_LONGITUDE =
+    39.826206;
+
+
+/* ================================================
+   Calculate Qibla Bearing
+================================================ */
+
+function calculateQiblaBearing() {
+
+    if (
+        STATE.latitude === null ||
+        STATE.longitude === null
+    ) {
+
+        return null;
+
+    }
+
+    const lat1 =
+        STATE.latitude * Math.PI / 180;
+
+    const lon1 =
+        STATE.longitude * Math.PI / 180;
+
+    const lat2 =
+        KAABA_LATITUDE * Math.PI / 180;
+
+    const lon2 =
+        KAABA_LONGITUDE * Math.PI / 180;
+
+
+    const deltaLon =
+        lon2 - lon1;
+
+
+    const y =
+        Math.sin(deltaLon) *
+        Math.cos(lat2);
+
+
+    const x =
+        Math.cos(lat1) *
+        Math.sin(lat2)
+        -
+        Math.sin(lat1) *
+        Math.cos(lat2) *
+        Math.cos(deltaLon);
+
+
+    let bearing =
+        Math.atan2(y, x) *
+        180 / Math.PI;
+
+
+    bearing =
+        (bearing + 360) % 360;
+
+
+    return bearing;
+
+}
+
+
+/* ================================================
+   Update Qibla Bearing
+================================================ */
+
+function updateQiblaBearing() {
+
+    qiblaBearing =
+        calculateQiblaBearing();
+
+    if (qiblaBearing === null) {
+
+        if (qiblaBearingDisplay) {
+
+            qiblaBearingDisplay.textContent =
+                "--°";
+
+        }
+
+        return;
+
+    }
+
+
+    if (qiblaBearingDisplay) {
+
+        qiblaBearingDisplay.textContent =
+            `${qiblaBearing.toFixed(1)}°`;
+
+    }
+
+}
+
+
+/* ================================================
+   Open Qibla
+================================================ */
+
+if (openQiblaButton) {
+
+    openQiblaButton.addEventListener(
+        "click",
+        () => {
+
+            if (!qiblaPanel) return;
+
+            qiblaPanel.classList.add("active");
+
+            updateQiblaBearing();
+
+            qiblaPanel.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }
+    );
+
+}
+
+
+/* ================================================
+   Close Qibla
+================================================ */
+
+if (closeQiblaButton) {
+
+    closeQiblaButton.addEventListener(
+        "click",
+        () => {
+
+            if (!qiblaPanel) return;
+
+            qiblaPanel.classList.remove("active");
+
+        }
+    );
+
+}
+
+
+/* ================================================
+   Compass Permission
+================================================ */
+
+async function enableCompass() {
+
+    try {
+
+        if (
+            typeof DeviceOrientationEvent !==
+            "undefined" &&
+            typeof DeviceOrientationEvent
+                .requestPermission === "function"
+        ) {
+
+            const permission =
+                await DeviceOrientationEvent
+                    .requestPermission();
+
+            if (permission !== "granted") {
+
+                throw new Error(
+                    "Compass permission denied"
+                );
+
+            }
+
+        }
+
+        window.addEventListener(
+            "deviceorientation",
+            handleCompass,
+            true
+        );
+
+        compassEnabled = true;
+
+        if (qiblaStatus) {
+
+            qiblaStatus.textContent =
+                "🧭 Compass active";
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        if (qiblaStatus) {
+
+            qiblaStatus.textContent =
+                "Compass permission unavailable";
+
+        }
+
+    }
+
+}
+
+
+/* ================================================
+   Compass Heading
+================================================ */
+
+function handleCompass(event) {
+
+    let heading = null;
+
+
+    /*
+     * iPhone / iOS
+     */
+
+    if (
+        typeof event.webkitCompassHeading ===
+        "number"
+    ) {
+
+        heading =
+            event.webkitCompassHeading;
+
+    }
+
+
+    /*
+     * Other browsers
+     */
+
+    else if (
+        typeof event.alpha === "number"
+    ) {
+
+        heading =
+            360 - event.alpha;
+
+    }
+
+
+    if (heading === null) return;
+
+
+    heading =
+        (heading + 360) % 360;
+
+
+    if (currentHeadingDisplay) {
+
+        currentHeadingDisplay.textContent =
+            `${heading.toFixed(1)}°`;
+
+    }
+
+
+    /*
+     * Rotate Qibla arrow relative
+     * to current phone heading.
+     */
+
+    if (
+        qiblaArrow &&
+        qiblaBearing !== null
+    ) {
+
+        const rotation =
+            qiblaBearing - heading;
+
+        qiblaArrow.style.transform =
+            `rotate(${rotation}deg)`;
+
+    }
+
+}
+
+
+if (enableCompassButton) {
+
+    enableCompassButton.addEventListener(
+        "click",
+        enableCompass
+    );
+
+}
+
+
 
 
 
