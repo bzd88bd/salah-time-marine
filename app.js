@@ -1117,3 +1117,111 @@ function closeSettingsPanel() {
     panel.classList.remove("active");
 
 }
+
+
+
+/* ================================================
+   Version 1.3 - Settings Save
+================================================ */
+
+function saveSettingsPanel() {
+
+    /* Calculation Method */
+
+    const calculation =
+        document.getElementById("calculationSelect");
+
+    if (calculation) {
+        APP.calculationMethod =
+            calculation.value;
+    }
+
+
+    /* Asr Method */
+
+    const asr =
+        document.getElementById("asrSelect");
+
+    if (asr) {
+        APP.asrMethod =
+            asr.value;
+    }
+
+
+    /* Time Format */
+
+    const timeFormat =
+        document.getElementById("timeFormatSelect");
+
+    if (timeFormat) {
+        APP.timeFormat =
+            Number(timeFormat.value);
+    }
+
+
+    /* Automatic Location */
+
+    const autoLocation =
+        document.getElementById("autoLocationToggle");
+
+    if (autoLocation) {
+        APP.autoLocation =
+            autoLocation.checked;
+    }
+
+
+    /* Save to localStorage */
+
+    localStorage.setItem(
+        "salahTimeSettings",
+        JSON.stringify(APP)
+    );
+
+
+    /* Update visible Asr method */
+
+    if (ui.asrMethod) {
+
+        ui.asrMethod.textContent =
+            APP.asrMethod;
+
+    }
+
+
+    /* Recalculate prayer times */
+
+    if (
+        STATE.latitude !== null &&
+        STATE.longitude !== null
+    ) {
+
+        calculatePrayerTimes();
+
+        updateHijriDate();
+
+        updateShipTime();
+
+        startCountdown();
+
+    }
+
+
+    /* Close Settings */
+
+    const panel =
+        document.getElementById("settingsPanel");
+
+    if (panel) {
+
+        panel.classList.remove("active");
+
+    }
+
+
+    alert("Settings saved successfully.");
+
+}
+
+
+
+
