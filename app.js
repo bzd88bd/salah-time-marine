@@ -1079,3 +1079,41 @@ if (saveSettingsButton) {
     );
 
 }
+
+
+
+
+
+/* ================================================
+   Version 1.3 - Settings Open / Close
+================================================ */
+
+function openSettingsPanel() {
+
+    const panel =
+        document.getElementById("settingsPanel");
+
+    if (!panel) return;
+
+    panel.classList.add("active");
+
+    loadSettingsIntoUI();
+
+    panel.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+}
+
+
+function closeSettingsPanel() {
+
+    const panel =
+        document.getElementById("settingsPanel");
+
+    if (!panel) return;
+
+    panel.classList.remove("active");
+
+}
