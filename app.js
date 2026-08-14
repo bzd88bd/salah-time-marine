@@ -1692,11 +1692,8 @@ if (
     qiblaBearing !== null
 ) {
 
-    const qiblaRotation =
-        qiblaBearing + heading;
-
     qiblaArrow.style.transform =
-        `rotate(${qiblaRotation}deg)`;
+        `rotate(${qiblaBearing}deg)`;
 
 }
 
