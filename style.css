@@ -506,4 +506,38 @@ button:focus{
 
 
 
+/* =========================================
+   Prayer Time Adjustment
+========================================= */
+
+.adjustmentGrid {
+    margin-top: 12px;
+}
+
+.adjustmentRow {
+    display: grid;
+    grid-template-columns: 1fr 42px 70px 42px;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.adjustmentRow > span:first-child {
+    font-weight: 600;
+}
+
+.adjustmentRow button {
+    width: 42px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.adjustmentRow span:nth-child(3) {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+}
 
