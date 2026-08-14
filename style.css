@@ -615,8 +615,11 @@ button:focus{
 
     align-items: center;
 
-}
+    will-change: transform;
 
+    transition: none;
+
+}
 .compassDirection {
 
     position: absolute;
