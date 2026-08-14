@@ -694,7 +694,7 @@ function findNextPrayer() {
 
     ];
 
-    for (let prayer of prayers) {
+    for (const prayer of prayers) {
 
         if (now < prayer.time) {
 
@@ -702,38 +702,69 @@ function findNextPrayer() {
 
             updateNextPrayer();
 
+            updateCountdown();
+
             return;
 
         }
 
     }
 
-    // Tomorrow's Fajr
+
+    /* ============================================
+       Tomorrow's Fajr
+    ============================================ */
 
     const tomorrow = new Date();
 
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const coordinates = new adhan.Coordinates(
-        STATE.latitude,
-        STATE.longitude
+    tomorrow.setDate(
+        tomorrow.getDate() + 1
     );
 
-    const tomorrowPrayer = new adhan.PrayerTimes(
-        coordinates,
-        tomorrow,
-        createCalculationParameters()
-    );
+    const coordinates =
+        new adhan.Coordinates(
+            STATE.latitude,
+            STATE.longitude
+        );
+
+    const tomorrowPrayer =
+        new adhan.PrayerTimes(
+            coordinates,
+            tomorrow,
+            createCalculationParameters()
+        );
+
+
+    let tomorrowFajr =
+        tomorrowPrayer.fajr;
+
+
+    /* Apply Fajr adjustment */
+
+    const fajrAdjustment =
+        Number(
+            APP.prayerAdjustment?.fajr || 0
+        );
+
+    tomorrowFajr =
+        new Date(
+            tomorrowFajr.getTime()
+            +
+            fajrAdjustment * 60000
+        );
+
 
     STATE.nextPrayer = {
 
         name: "Fajr",
 
-        time: tomorrowPrayer.fajr
+        time: tomorrowFajr
 
     };
 
     updateNextPrayer();
+
+    updateCountdown();
 
 }
 
