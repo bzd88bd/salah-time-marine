@@ -865,4 +865,217 @@ if (refreshButton) {
 
 }
 
+/* ================================================
+   Version 1.3 - Settings
+================================================ */
 
+const settingsPanel =
+    document.getElementById("settingsPanel");
+
+const openSettingsButton =
+    document.getElementById("openSettings");
+
+const closeSettingsButton =
+    document.getElementById("closeSettings");
+
+const saveSettingsButton =
+    document.getElementById("saveSettings");
+
+const calculationSelect =
+    document.getElementById("calculationSelect");
+
+const asrSelect =
+    document.getElementById("asrSelect");
+
+const timeFormatSelect =
+    document.getElementById("timeFormatSelect");
+
+const autoLocationToggle =
+    document.getElementById("autoLocationToggle");
+
+
+/* ================================================
+   Open Settings
+================================================ */
+
+if (openSettingsButton) {
+
+    openSettingsButton.addEventListener(
+        "click",
+        () => {
+
+            if (!settingsPanel) return;
+
+            settingsPanel.classList.add("active");
+
+            loadSettingsIntoUI();
+
+            settingsPanel.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }
+    );
+
+}
+
+
+/* ================================================
+   Close Settings
+================================================ */
+
+if (closeSettingsButton) {
+
+    closeSettingsButton.addEventListener(
+        "click",
+        () => {
+
+            if (!settingsPanel) return;
+
+            settingsPanel.classList.remove("active");
+
+        }
+    );
+
+}
+
+
+/* ================================================
+   Load APP Settings into UI
+================================================ */
+
+function loadSettingsIntoUI() {
+
+    if (calculationSelect) {
+
+        calculationSelect.value =
+            APP.calculationMethod;
+
+    }
+
+
+    if (asrSelect) {
+
+        asrSelect.value =
+            APP.asrMethod;
+
+    }
+
+
+    if (timeFormatSelect) {
+
+        timeFormatSelect.value =
+            String(APP.timeFormat);
+
+    }
+
+
+    if (autoLocationToggle) {
+
+        autoLocationToggle.checked =
+            APP.autoLocation;
+
+    }
+
+}
+
+
+/* ================================================
+   Save Settings
+================================================ */
+
+if (saveSettingsButton) {
+
+    saveSettingsButton.addEventListener(
+        "click",
+        () => {
+
+            if (calculationSelect) {
+
+                APP.calculationMethod =
+                    calculationSelect.value;
+
+            }
+
+
+            if (asrSelect) {
+
+                APP.asrMethod =
+                    asrSelect.value;
+
+            }
+
+
+            if (timeFormatSelect) {
+
+                APP.timeFormat =
+                    Number(timeFormatSelect.value);
+
+            }
+
+
+            if (autoLocationToggle) {
+
+                APP.autoLocation =
+                    autoLocationToggle.checked;
+
+            }
+
+
+            saveSettings();
+
+
+            /*
+             * Update visible settings
+             */
+
+            if (ui.asrMethod) {
+
+                ui.asrMethod.textContent =
+                    APP.asrMethod;
+
+            }
+
+
+            /*
+             * Recalculate prayer times
+             */
+
+            if (
+                STATE.latitude !== null &&
+                STATE.longitude !== null
+            ) {
+
+                calculatePrayerTimes();
+
+                updateHijriDate();
+
+                updateShipTime();
+
+                startCountdown();
+
+            }
+
+
+            /*
+             * Close Settings
+             */
+
+            if (settingsPanel) {
+
+                settingsPanel.classList.remove(
+                    "active"
+                );
+
+            }
+
+
+            alert(
+                "Settings saved successfully."
+            );
+
+        }
+    );
+
+}
