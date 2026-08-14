@@ -257,56 +257,80 @@ async function reverseGeocode() {
 
     try {
 
-        const response = await fetch(
+        const url =
+            `https://nominatim.openstreetmap.org/reverse` +
+            `?format=jsonv2` +
+            `&lat=${STATE.latitude}` +
+            `&lon=${STATE.longitude}` +
+            `&zoom=10` +
+            `&addressdetails=1`;
 
-            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${STATE.latitude}&lon=${STATE.longitude}`
+        const response = await fetch(url, {
+            headers: {
+                "Accept": "application/json"
+            }
+        });
 
-        );
-
+        if (!response.ok) {
+            throw new Error(
+                `Reverse geocoding failed: ${response.status}`
+            );
+        }
 
         const data = await response.json();
 
-
         const address = data.address || {};
-
 
         STATE.country =
             address.country || "";
 
-
         STATE.city =
-
             address.city ||
-
             address.town ||
-
             address.village ||
-
             address.municipality ||
-
             address.county ||
-
             address.state ||
-
             "";
 
+        /*
+         * Marine fallback
+         * If no city/area is returned by Nominatim,
+         * use offshore location instead of Unknown Location.
+         */
 
-        if (!STATE.city && data.display_name) {
+        if (!STATE.city) {
 
-            STATE.city =
-                data.display_name.split(",")[0];
+            if (data.name) {
+
+                STATE.city = data.name;
+
+            }
+            else if (data.display_name) {
+
+                const firstPart =
+                    data.display_name.split(",")[0].trim();
+
+                if (firstPart) {
+
+                    STATE.city = firstPart;
+
+                }
+
+            }
 
         }
 
-
     }
 
-    catch(error) {
+    catch (error) {
 
-        console.error(error);
+        console.error(
+            "Reverse geocoding error:",
+            error
+        );
 
         STATE.country = "";
-
         STATE.city = "";
 
     }
@@ -318,25 +342,52 @@ async function reverseGeocode() {
 
 function updateLocationInfo() {
 
-    if (ui.position && STATE.latitude !== null) {
+    /*
+     * Current Position
+     */
+
+    if (
+        ui.position &&
+        STATE.latitude !== null &&
+        STATE.longitude !== null
+    ) {
 
         ui.position.textContent =
-            `${STATE.latitude.toFixed(4)}, ${STATE.longitude.toFixed(4)}`;
+            `${STATE.latitude.toFixed(4)}, ` +
+            `${STATE.longitude.toFixed(4)}`;
 
     }
 
 
-    if (STATE.city || STATE.country) {
+    /*
+     * Nearest Location
+     */
+
+    if (STATE.city && STATE.country) {
 
         ui.location.textContent =
             `${STATE.city}, ${STATE.country}`;
 
     }
 
+    else if (STATE.city) {
+
+        ui.location.textContent =
+            STATE.city;
+
+    }
+
+    else if (STATE.country) {
+
+        ui.location.textContent =
+            STATE.country;
+
+    }
+
     else {
 
         ui.location.textContent =
-            "Unknown Location";
+            "Offshore Area";
 
     }
 
