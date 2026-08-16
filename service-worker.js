@@ -1,4 +1,4 @@
-const CACHE_NAME = "salah-time-marine-v1.7";
+const CACHE_NAME = "salah-time-marine-v1.7.1";
 
 const APP_FILES = [
     "./",
@@ -9,7 +9,10 @@ const APP_FILES = [
     "./manifest.json"
 ];
 
-/* Install */
+
+/* ================================================
+   Install
+================================================ */
 
 self.addEventListener("install", event => {
 
@@ -21,48 +24,84 @@ self.addEventListener("install", event => {
                 return cache.addAll(APP_FILES);
 
             })
+            .then(() => {
+
+                return self.skipWaiting();
+
+            })
 
     );
-
-    self.skipWaiting();
 
 });
 
 
-/* Activate */
+/* ================================================
+   Activate
+================================================ */
 
 self.addEventListener("activate", event => {
 
     event.waitUntil(
 
         caches.keys()
-            .then(keys => {
+            .then(cacheNames => {
 
                 return Promise.all(
 
-                    keys
-                        .filter(key => key !== CACHE_NAME)
-                        .map(key => caches.delete(key))
+                    cacheNames
+                        .filter(name => {
+
+                            return name.startsWith(
+                                "salah-time-marine-"
+                            ) &&
+                            name !== CACHE_NAME;
+
+                        })
+                        .map(name => {
+
+                            return caches.delete(name);
+
+                        })
 
                 );
+
+            })
+            .then(() => {
+
+                return self.clients.claim();
 
             })
 
     );
 
-    self.clients.claim();
-
 });
 
 
-/* Fetch */
+/* ================================================
+   Fetch
+================================================ */
 
 self.addEventListener("fetch", event => {
+
+    /*
+     * Only handle GET requests.
+     */
+
+    if (event.request.method !== "GET") {
+
+        return;
+
+    }
+
 
     event.respondWith(
 
         caches.match(event.request)
             .then(cachedResponse => {
+
+                /*
+                 * Cached file available
+                 */
 
                 if (cachedResponse) {
 
@@ -70,7 +109,29 @@ self.addEventListener("fetch", event => {
 
                 }
 
+
+                /*
+                 * Not cached:
+                 * try Internet
+                 */
+
                 return fetch(event.request);
+
+            })
+            .catch(() => {
+
+                /*
+                 * Internet unavailable and
+                 * resource not cached.
+                 */
+
+                return new Response(
+                    "Offline",
+                    {
+                        status: 503,
+                        statusText: "Offline"
+                    }
+                );
 
             })
 
