@@ -142,6 +142,8 @@ setInterval(updateShipTime, 1000);
 
     startCountdown();
 
+   updateLastLocationStatus();
+
 }
 catch (err) {
 
@@ -384,6 +386,137 @@ function loadLastKnownLocation() {
     }
 
 }
+
+
+
+/* ================================================
+   Last Known Location Status
+================================================ */
+
+function getLastKnownLocationInfo() {
+
+    const saved =
+        localStorage.getItem("lastKnownLocation");
+
+    if (!saved) {
+
+        return null;
+
+    }
+
+    try {
+
+        const location =
+            JSON.parse(saved);
+
+        if (!location.savedAt) {
+
+            return null;
+
+        }
+
+        const savedTime =
+            new Date(location.savedAt);
+
+        if (isNaN(savedTime.getTime())) {
+
+            return null;
+
+        }
+
+        const now =
+            new Date();
+
+        const diffMs =
+            now.getTime() -
+            savedTime.getTime();
+
+        const diffMinutes =
+            Math.floor(
+                diffMs / 60000
+            );
+
+        return {
+
+            savedAt: savedTime,
+
+            minutesAgo: diffMinutes
+
+        };
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Last location status error:",
+            error
+        );
+
+        return null;
+
+    }
+
+}
+
+
+
+/* ================================================
+   Display Last GPS Update
+================================================ */
+
+function updateLastLocationStatus() {
+
+    const info =
+        getLastKnownLocationInfo();
+
+    if (!info) {
+
+        return;
+
+    }
+
+    const statusElement =
+        document.getElementById(
+            "lastLocationStatus"
+        );
+
+    if (!statusElement) {
+
+        return;
+
+    }
+
+    const minutes =
+        info.minutesAgo;
+
+
+    if (minutes < 1) {
+
+        statusElement.textContent =
+            "Last GPS Update: Just now";
+
+    }
+
+    else if (minutes < 60) {
+
+        statusElement.textContent =
+            `Last GPS Update: ${minutes} min ago`;
+
+    }
+
+    else {
+
+        const hours =
+            Math.floor(minutes / 60);
+
+        statusElement.textContent =
+            `Last GPS Update: ${hours} hr ago`;
+
+    }
+
+}
+
 
 
 
@@ -1016,6 +1149,8 @@ if (refreshButton) {
             updateLocationInfo();
 
             calculatePrayerTimes();
+
+           updateLastLocationStatus();
 
         }
     );
