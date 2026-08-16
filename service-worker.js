@@ -1,4 +1,4 @@
-const CACHE_NAME = "salah-time-marine-v1.7.1";
+const CACHE_NAME = "salah-time-marine-v1.7.2";
 
 const APP_FILES = [
     "./",
@@ -11,7 +11,7 @@ const APP_FILES = [
 
 
 /* ================================================
-   Install
+   INSTALL
 ================================================ */
 
 self.addEventListener("install", event => {
@@ -19,16 +19,8 @@ self.addEventListener("install", event => {
     event.waitUntil(
 
         caches.open(CACHE_NAME)
-            .then(cache => {
-
-                return cache.addAll(APP_FILES);
-
-            })
-            .then(() => {
-
-                return self.skipWaiting();
-
-            })
+            .then(cache => cache.addAll(APP_FILES))
+            .then(() => self.skipWaiting())
 
     );
 
@@ -36,7 +28,7 @@ self.addEventListener("install", event => {
 
 
 /* ================================================
-   Activate
+   ACTIVATE
 ================================================ */
 
 self.addEventListener("activate", event => {
@@ -44,33 +36,25 @@ self.addEventListener("activate", event => {
     event.waitUntil(
 
         caches.keys()
-            .then(cacheNames => {
+            .then(names => {
 
                 return Promise.all(
 
-                    cacheNames
-                        .filter(name => {
-
-                            return name.startsWith(
+                    names
+                        .filter(name =>
+                            name.startsWith(
                                 "salah-time-marine-"
                             ) &&
-                            name !== CACHE_NAME;
-
-                        })
-                        .map(name => {
-
-                            return caches.delete(name);
-
-                        })
+                            name !== CACHE_NAME
+                        )
+                        .map(name =>
+                            caches.delete(name)
+                        )
 
                 );
 
             })
-            .then(() => {
-
-                return self.clients.claim();
-
-            })
+            .then(() => self.clients.claim())
 
     );
 
@@ -78,30 +62,47 @@ self.addEventListener("activate", event => {
 
 
 /* ================================================
-   Fetch
+   FETCH
 ================================================ */
 
 self.addEventListener("fetch", event => {
 
-    /*
-     * Only handle GET requests.
-     */
-
     if (event.request.method !== "GET") {
+        return;
+    }
+
+
+    /* ============================================
+       Navigation Request
+       Safari offline refresh fix
+    ============================================ */
+
+    if (event.request.mode === "navigate") {
+
+        event.respondWith(
+
+            fetch(event.request)
+                .catch(() => {
+
+                    return caches.match("./index.html");
+
+                })
+
+        );
 
         return;
 
     }
 
 
+    /* ============================================
+       Other Files
+    ============================================ */
+
     event.respondWith(
 
         caches.match(event.request)
             .then(cachedResponse => {
-
-                /*
-                 * Cached file available
-                 */
 
                 if (cachedResponse) {
 
@@ -109,29 +110,7 @@ self.addEventListener("fetch", event => {
 
                 }
 
-
-                /*
-                 * Not cached:
-                 * try Internet
-                 */
-
                 return fetch(event.request);
-
-            })
-            .catch(() => {
-
-                /*
-                 * Internet unavailable and
-                 * resource not cached.
-                 */
-
-                return new Response(
-                    "Offline",
-                    {
-                        status: 503,
-                        statusText: "Offline"
-                    }
-                );
 
             })
 
