@@ -470,12 +470,6 @@ function updateLastLocationStatus() {
     const info =
         getLastKnownLocationInfo();
 
-    if (!info) {
-
-        return;
-
-    }
-
     const statusElement =
         document.getElementById(
             "lastLocationStatus"
@@ -487,21 +481,36 @@ function updateLastLocationStatus() {
 
     }
 
+    if (!info) {
+
+        statusElement.textContent =
+            "GPS Update: No data";
+
+        return;
+
+    }
+
     const minutes =
         info.minutesAgo;
 
 
-    if (minutes < 1) {
+    /* =========================================
+       GPS Status
+    ========================================= */
+
+    if (minutes < 10) {
 
         statusElement.textContent =
-            "Last GPS Update: Just now";
+            minutes < 1
+                ? "🟢 GPS Updated: Just now"
+                : `🟢 GPS Updated: ${minutes} min ago`;
 
     }
 
-    else if (minutes < 60) {
+    else if (minutes < 30) {
 
         statusElement.textContent =
-            `Last GPS Update: ${minutes} min ago`;
+            `🟡 GPS Update Aging: ${minutes} min ago`;
 
     }
 
@@ -510,8 +519,19 @@ function updateLastLocationStatus() {
         const hours =
             Math.floor(minutes / 60);
 
-        statusElement.textContent =
-            `Last GPS Update: ${hours} hr ago`;
+        if (hours < 1) {
+
+            statusElement.textContent =
+                `🔴 GPS Stale: ${minutes} min ago — Using Last Known Position`;
+
+        }
+
+        else {
+
+            statusElement.textContent =
+                `🔴 GPS Stale: ${hours} hr ago — Using Last Known Position`;
+
+        }
 
     }
 
