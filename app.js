@@ -1091,13 +1091,24 @@ function startCountdown() {
 
     updateCountdown();
 
+    updateLastLocationStatus();
+
+
     if (window.countdownTimer) {
 
         clearInterval(window.countdownTimer);
 
     }
 
-    window.countdownTimer = setInterval(updateCountdown, 1000);
+
+    window.countdownTimer =
+        setInterval(() => {
+
+            updateCountdown();
+
+            updateLastLocationStatus();
+
+        }, 1000);
 
 }
 
@@ -2218,22 +2229,6 @@ if ("serviceWorker" in navigator) {
     });
 
 }
-
-
-
-
-
-/* ================================================
-   Update Last GPS Status
-================================================ */
-
-setInterval(() => {
-
-    updateLastLocationStatus();
-
-}, 60000);
-
-
 
 
 
