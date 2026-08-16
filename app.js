@@ -243,20 +243,68 @@ async function getCurrentLocation() {
                 STATE.longitude =
                     position.coords.longitude;
 
-               updateGPSStatus();
+                updateGPSStatus();
+
 
                 STATE.timezone =
                     Intl.DateTimeFormat()
                     .resolvedOptions()
                     .timeZone;
 
-                await reverseGeocode();
+
+                /* =========================================
+                   Save Last Known GPS Location
+                ========================================= */
+
+                localStorage.setItem(
+                    "lastKnownLocation",
+                    JSON.stringify({
+
+                        latitude:
+                            STATE.latitude,
+
+                        longitude:
+                            STATE.longitude,
+
+                        timezone:
+                            STATE.timezone,
+
+                        savedAt:
+                            new Date().toISOString()
+
+                    })
+                );
+
+
+                /* =========================================
+                   Reverse Geocoding
+                   Optional - Internet required
+                ========================================= */
+
+                try {
+
+                    await reverseGeocode();
+
+                }
+
+                catch (error) {
+
+                    console.warn(
+                        "Reverse geocoding unavailable. Using GPS only."
+                    );
+
+                }
+
 
                 resolve();
 
             },
 
-            error => reject(error),
+            error => {
+
+                reject(error);
+
+            },
 
             {
 
@@ -273,6 +321,72 @@ async function getCurrentLocation() {
     });
 
 }
+
+
+/* ================================================
+   Last Known Location
+================================================ */
+
+function loadLastKnownLocation() {
+
+    const saved =
+        localStorage.getItem("lastKnownLocation");
+
+    if (!saved) {
+
+        return false;
+
+    }
+
+    try {
+
+        const location =
+            JSON.parse(saved);
+
+        if (
+            typeof location.latitude !== "number" ||
+            typeof location.longitude !== "number"
+        ) {
+
+            return false;
+
+        }
+
+        STATE.latitude =
+            location.latitude;
+
+        STATE.longitude =
+            location.longitude;
+
+        STATE.timezone =
+            location.timezone ||
+            Intl.DateTimeFormat()
+            .resolvedOptions()
+            .timeZone;
+
+        STATE.city = "";
+
+        STATE.country = "";
+
+        return true;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Last known location error:",
+            error
+        );
+
+        return false;
+
+    }
+
+}
+
+
+
 
 /* ================================================
    Reverse Geocode
