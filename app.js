@@ -220,6 +220,8 @@ async function getCurrentLocation() {
                 STATE.longitude =
                     position.coords.longitude;
 
+               updateGPSStatus();
+
                 STATE.timezone =
                     Intl.DateTimeFormat()
                     .resolvedOptions()
@@ -1578,6 +1580,8 @@ async function enableCompass() {
 
         compassEnabled = true;
 
+       updateCompassStatus();
+
         if (qiblaStatus) {
 
             qiblaStatus.textContent =
@@ -1708,6 +1712,208 @@ if (enableCompassButton) {
     );
 
 }
+
+
+/* ================================================
+   Version 1.5 - System Status
+================================================ */
+
+const systemStatusUI = {
+
+    gps:
+        document.getElementById("gpsStatus"),
+
+    internet:
+        document.getElementById("internetStatus"),
+
+    compass:
+        document.getElementById("compassStatus"),
+
+    position:
+        document.getElementById("positionStatus")
+
+};
+
+
+/* ================================================
+   Status Helper
+================================================ */
+
+function setSystemStatus(element, text, good) {
+
+    if (!element) return;
+
+    element.textContent = text;
+
+    element.classList.remove(
+        "statusGood",
+        "statusBad",
+        "statusChecking"
+    );
+
+    element.classList.add(
+        good ? "statusGood" : "statusBad"
+    );
+
+}
+
+
+/* ================================================
+   GPS / Position
+================================================ */
+
+function updateGPSStatus() {
+
+    if (
+        STATE.latitude !== null &&
+        STATE.longitude !== null
+    ) {
+
+        setSystemStatus(
+            systemStatusUI.gps,
+            "🟢 Live",
+            true
+        );
+
+        setSystemStatus(
+            systemStatusUI.position,
+            "🟢 Updated",
+            true
+        );
+
+    }
+
+    else {
+
+        setSystemStatus(
+            systemStatusUI.gps,
+            "🔴 Unavailable",
+            false
+        );
+
+        setSystemStatus(
+            systemStatusUI.position,
+            "🔴 Not Updated",
+            false
+        );
+
+    }
+
+}
+
+
+/* ================================================
+   Internet
+================================================ */
+
+function updateInternetStatus() {
+
+    if (navigator.onLine) {
+
+        setSystemStatus(
+            systemStatusUI.internet,
+            "🟢 Online",
+            true
+        );
+
+    }
+
+    else {
+
+        setSystemStatus(
+            systemStatusUI.internet,
+            "🔴 Offline",
+            false
+        );
+
+    }
+
+}
+
+
+/* ================================================
+   Compass
+================================================ */
+
+function updateCompassStatus() {
+
+    if (compassEnabled) {
+
+        setSystemStatus(
+            systemStatusUI.compass,
+            "🟢 Available",
+            true
+        );
+
+        return;
+
+    }
+
+
+    if (
+        typeof DeviceOrientationEvent !==
+        "undefined"
+    ) {
+
+        setSystemStatus(
+            systemStatusUI.compass,
+            "🟡 Ready",
+            true
+        );
+
+    }
+
+    else {
+
+        setSystemStatus(
+            systemStatusUI.compass,
+            "🔴 Unavailable",
+            false
+        );
+
+    }
+
+}
+
+
+/* ================================================
+   All Status
+================================================ */
+
+function updateSystemStatus() {
+
+    updateGPSStatus();
+
+    updateInternetStatus();
+
+    updateCompassStatus();
+
+}
+
+
+/* ================================================
+   Internet Events
+================================================ */
+
+window.addEventListener(
+    "online",
+    updateInternetStatus
+);
+
+window.addEventListener(
+    "offline",
+    updateInternetStatus
+);
+
+
+/* ================================================
+   Initial Status
+================================================ */
+
+updateSystemStatus();
+
+
+
 
 
 
