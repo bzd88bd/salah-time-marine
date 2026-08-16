@@ -143,13 +143,36 @@ setInterval(updateShipTime, 1000);
     startCountdown();
 
 }
-
 catch (err) {
 
-    console.error(err);
+    console.error("Location initialization error:", err);
 
-    ui.location.textContent =
-        "Location unavailable";
+    /*
+     * Offline / location fallback
+     * Prayer calculation will continue if GPS
+     * coordinates are already available.
+     */
+
+    if (
+        STATE.latitude !== null &&
+        STATE.longitude !== null
+    ) {
+
+        updateLocationInfo();
+
+        calculatePrayerTimes();
+
+        updateHijriDate();
+
+        startCountdown();
+
+    }
+    else {
+
+        ui.location.textContent =
+            "Location unavailable";
+
+    }
 
 }
 
