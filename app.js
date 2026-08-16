@@ -2223,6 +2223,21 @@ if ("serviceWorker" in navigator) {
 
 
 
+/* ================================================
+   Update Last GPS Status
+================================================ */
+
+setInterval(() => {
+
+    updateLastLocationStatus();
+
+}, 60000);
+
+
+
+
+
+
 
 
 
