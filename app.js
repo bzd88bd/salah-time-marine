@@ -1056,14 +1056,32 @@ function findNextPrayer() {
 }
 
 
+/* ================================================
+   Update Next Prayer Name and Time
+================================================ */
+
 function updateNextPrayer() {
 
     if (!STATE.nextPrayer) return;
 
+    // Update prayer name
+    if (ui.nextPrayer) {
 
-    ui.nextPrayer.textContent =
+        ui.nextPrayer.textContent =
+            STATE.nextPrayer.name;
 
-        STATE.nextPrayer.name;
+    }
+
+    // Update prayer time
+    const prayerTimeElement =
+        document.getElementById("nextPrayerTime");
+
+    if (prayerTimeElement && STATE.nextPrayer.time) {
+
+        prayerTimeElement.textContent =
+            formatTime(STATE.nextPrayer.time);
+
+    }
 
 }
 
