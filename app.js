@@ -283,22 +283,17 @@ async function getCurrentLocation() {
                    Optional - Internet required
                 ========================================= */
 
-                try {
+                // Reverse geocoding runs in the background.
+Promise.resolve()
+    .then(() => reverseGeocode())
+    .catch(error => {
+        console.warn(
+            "Reverse geocoding unavailable. Using GPS only.",
+            error
+        );
+    });
 
-                    await reverseGeocode();
-
-                }
-
-                catch (error) {
-
-                    console.warn(
-                        "Reverse geocoding unavailable. Using GPS only."
-                    );
-
-                }
-
-
-                resolve();
+resolve();
 
             },
 
