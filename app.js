@@ -1222,12 +1222,12 @@ function updateHijriDate() {
    Refresh Button
 ================================================ */
 
+/* ================================================
+   Refresh Location - GPS Fallback
+================================================ */
+
 const refreshButton =
-
-    document.getElementById(
-        "refreshLocation"
-    );
-
+    document.getElementById("refreshLocation");
 
 if (refreshButton) {
 
@@ -1235,19 +1235,83 @@ if (refreshButton) {
         "click",
         async () => {
 
-            await getCurrentLocation();
+            refreshButton.disabled = true;
 
-            updateLocationInfo();
+            const originalText =
+                refreshButton.textContent;
 
-            calculatePrayerTimes();
+            refreshButton.textContent =
+                "Locating...";
 
-           updateLastLocationStatus();
+            try {
+
+                // Try to get a fresh GPS position
+                await getCurrentLocation();
+
+                updateLocationInfo();
+
+                calculatePrayerTimes();
+
+                updateHijriDate();
+
+                updateLastLocationStatus();
+
+            }
+
+            catch (error) {
+
+                console.warn(
+                    "GPS refresh failed. Checking last known location.",
+                    error
+                );
+
+                // Restore the last saved coordinates
+                const hasLastLocation =
+                    loadLastKnownLocation();
+
+                if (hasLastLocation) {
+
+                    updateLocationInfo();
+
+                    calculatePrayerTimes();
+
+                    updateHijriDate();
+
+                    updateLastLocationStatus();
+
+                }
+
+                else {
+
+                    if (ui.location) {
+                        ui.location.textContent =
+                            "Location unavailable";
+                    }
+
+                    if (ui.position) {
+                        ui.position.textContent =
+                            "--";
+                    }
+
+                    updateLastLocationStatus();
+
+                }
+
+            }
+
+            finally {
+
+                refreshButton.disabled = false;
+
+                refreshButton.textContent =
+                    originalText;
+
+            }
 
         }
     );
 
 }
-
 /* ================================================
    Version 1.3 - Settings
 ================================================ */
