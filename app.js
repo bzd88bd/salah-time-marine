@@ -278,68 +278,77 @@ function saveSettings() {
 }
 
 /* ================================================
-   GPS Location
-================================================ */
-
-/* ================================================
-   GPS Location - Diagnostic Version 1.9.2
-================================================ */
-
-/* ================================================
-   GPS Location - On-Screen Diagnostics
-================================================ */
-
-/* ================================================
-   GPS Location - Version 1.9.3
-================================================ */
-
-/* ================================================
-   GPS Location - Fixed Version 2.0
+   GPS Location - Version 2.1
 ================================================ */
 
 async function getCurrentLocation() {
+
     const statusElement =
         document.getElementById("lastLocationStatus");
 
-    const showStatus = (message) => {
+    function showStatus(message) {
         STATE.gpsStatusMessage = message;
 
         if (statusElement) {
             statusElement.textContent = message;
         }
-    };
+    }
 
+    // Prevent simultaneous GPS requests
     if (STATE.gpsRequestInProgress) {
         throw new Error("GPS request already in progress");
     }
 
+    // Check browser support
     if (!navigator.geolocation) {
-        showStatus("🔴 Geolocation is not supported");
-        throw new Error("Geolocation not supported");
+        const error = new Error(
+            "Geolocation is not supported by this browser."
+        );
+
+        STATE.gpsLastSuccess = false;
+        STATE.gpsLastError = error;
+
+        showStatus("🔴 GPS is not supported by this browser.");
+
+        updateGPSStatus();
+
+        throw error;
     }
 
     STATE.gpsRequestInProgress = true;
-    STATE.gpsLastError = null;
     STATE.gpsLastSuccess = false;
+    STATE.gpsLastError = null;
 
     showStatus("📡 Requesting GPS location...");
 
+    updateGPSStatus();
+
     try {
-        const position = await new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(
-                resolve,
-                reject,
-                {
-                    enableHighAccuracy: true,
-                    timeout: 30000,
-                    maximumAge: 0
-                }
-            );
-        });
 
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
+        // Request fresh GPS coordinates
+        const position = await new Promise(
+            (resolve, reject) => {
 
+                navigator.geolocation.getCurrentPosition(
+                    resolve,
+                    reject,
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 30000,
+                        maximumAge: 0
+                    }
+                );
+
+            }
+        );
+
+        const latitude =
+            position.coords.latitude;
+
+        const longitude =
+            position.coords.longitude;
+
+        // Validate received coordinates
         if (
             !Number.isFinite(latitude) ||
             !Number.isFinite(longitude) ||
@@ -351,56 +360,80 @@ async function getCurrentLocation() {
             throw new Error("Invalid GPS coordinates");
         }
 
+        // Update application state
         STATE.latitude = latitude;
         STATE.longitude = longitude;
 
         STATE.timezone =
-            Intl.DateTimeFormat().resolvedOptions().timeZone;
+            Intl.DateTimeFormat()
+                .resolvedOptions()
+                .timeZone;
 
         STATE.gpsLastSuccess = true;
         STATE.gpsLastError = null;
 
+        // Save successful GPS position
         localStorage.setItem(
             "lastKnownLocation",
             JSON.stringify({
-                latitude,
-                longitude,
+                latitude: latitude,
+                longitude: longitude,
                 timezone: STATE.timezone,
                 savedAt: new Date().toISOString()
             })
         );
 
+        // Update location display
         updateLocationInfo();
+
+        showStatus("🟢 GPS position received successfully.");
+
         updateGPSStatus();
 
-        showStatus("🟢 GPS position received successfully");
-
-        // Update the location name separately.
+        // Resolve GPS independently of reverse geocoding
         reverseGeocode()
             .then(() => {
                 updateLocationInfo();
                 updateCalculationInfo();
             })
             .catch(error => {
-                console.warn("Reverse geocoding failed:", error);
+                console.warn(
+                    "Reverse geocoding failed:",
+                    error
+                );
             });
 
         return position;
 
     } catch (error) {
+
         STATE.gpsLastSuccess = false;
         STATE.gpsLastError = error;
 
-        console.error("GPS error:", error);
+        console.error(
+            "GPS request failed:",
+            error
+        );
 
         if (error.code === 1) {
-            showStatus("🔴 GPS permission denied");
+
+            showStatus("🔴 GPS permission denied.");
+
         } else if (error.code === 2) {
-            showStatus("🔴 GPS position unavailable");
+
+            showStatus("🔴 GPS position unavailable.");
+
         } else if (error.code === 3) {
-            showStatus("🟡 GPS request timed out");
+
+            showStatus("🟡 GPS request timed out.");
+
         } else {
-            showStatus("🔴 GPS error: " + error.message);
+
+            showStatus(
+                "🔴 GPS error: " +
+                (error.message || "Unknown error")
+            );
+
         }
 
         updateGPSStatus();
@@ -408,8 +441,10 @@ async function getCurrentLocation() {
         throw error;
 
     } finally {
+
         STATE.gpsRequestInProgress = false;
-        updateLastLocationStatus();
+
+        updateGPSStatus();
     }
 }
 /* ================================================
