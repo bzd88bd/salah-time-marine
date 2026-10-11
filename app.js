@@ -587,78 +587,62 @@ function getLastKnownLocationInfo() {
    Display Last GPS Update
 ================================================ */
 
+/* ================================================
+   GPS Status Display - Version 2.1
+================================================ */
+
 function updateLastLocationStatus() {
-
-    const info =
-        getLastKnownLocationInfo();
-
     const statusElement =
-        document.getElementById(
-            "lastLocationStatus"
-        );
+        document.getElementById("lastLocationStatus");
 
-    if (!statusElement) {
+    if (!statusElement) return;
 
+    // Do not overwrite the status while GPS is running.
+    if (STATE.gpsRequestInProgress) {
+        statusElement.textContent =
+            STATE.gpsStatusMessage ||
+            "📡 Requesting GPS location...";
         return;
-
     }
+
+    // Preserve the most recent GPS error.
+    if (STATE.gpsLastError) {
+        statusElement.textContent =
+            STATE.gpsStatusMessage ||
+            "🔴 GPS request failed.";
+        return;
+    }
+
+    const info = getLastKnownLocationInfo();
 
     if (!info) {
-
         statusElement.textContent =
-            "GPS Update: No data";
-
+            "GPS Update: No saved position.";
         return;
-
     }
 
-    const minutes =
-        info.minutesAgo;
+    const minutes = info.minutesAgo;
 
-
-    /* =========================================
-       GPS Status
-    ========================================= */
-
-    if (minutes < 10) {
-
+    if (STATE.gpsLastSuccess) {
         statusElement.textContent =
             minutes < 1
-                ? "🟢 GPS Updated: Just now"
-                : `🟢 GPS Updated: ${minutes} min ago`;
-
+                ? "🟢 GPS received: Just now"
+                : `🟢 GPS received: ${minutes} min ago`;
+        return;
     }
 
-    else if (minutes < 30) {
+    if (minutes < 30) {
+        statusElement.textContent =
+            `🟡 Using saved position: ${minutes} min ago`;
+    } else {
+        const hours = Math.floor(minutes / 60);
 
         statusElement.textContent =
-            `🟡 GPS Update Aging: ${minutes} min ago`;
-
+            hours < 1
+                ? `🔴 GPS stale: ${minutes} min ago — saved position in use`
+                : `🔴 GPS stale: ${hours} hr ago — saved position in use`;
     }
-
-    else {
-
-        const hours =
-            Math.floor(minutes / 60);
-
-        if (hours < 1) {
-
-            statusElement.textContent =
-                `🔴 GPS Stale: ${minutes} min ago — Using Last Known Position`;
-
-        }
-
-        else {
-
-            statusElement.textContent =
-                `🔴 GPS Stale: ${hours} hr ago — Using Last Known Position`;
-
-        }
-
-    }
-
 }
-
 
 
 
