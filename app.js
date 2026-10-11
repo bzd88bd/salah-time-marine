@@ -1214,16 +1214,6 @@ function updateHijriDate() {
 const refreshButton =
     document.getElementById("refreshLocation");
 
-console.log("Refresh button found:", !!refreshButton);
-
-if (refreshButton) {
-    refreshButton.addEventListener("click", () => {
-        alert("Refresh button is working!");
-    });
-}
-
-
-
 if (refreshButton) {
 
     refreshButton.addEventListener(
