@@ -110,6 +110,10 @@ window.addEventListener("load", () => {
 
 });
 
+/* ================================================
+   Initialize App - GPS Reliability Version 1.9
+================================================ */
+
 async function initializeApp() {
 
     if (typeof adhan === "undefined") {
@@ -123,42 +127,46 @@ async function initializeApp() {
     loadSettings();
 
     updateTodayDate();
-   updateShipTime();
 
-setInterval(updateShipTime, 1000);
+    updateShipTime();
 
-    ui.asrMethod.textContent =
-        APP.asrMethod;
+    setInterval(updateShipTime, 1000);
+
+    if (ui.asrMethod) {
+
+        ui.asrMethod.textContent =
+            APP.asrMethod;
+
+    }
+
+    /*
+     * Restore Last Known Location
+     */
+
+    const hasLastLocation =
+        loadLastKnownLocation();
+
+    if (hasLastLocation) {
+
+        updateLocationInfo();
+
+        updateGPSStatus();
+
+        calculatePrayerTimes();
+
+        updateHijriDate();
+
+        startCountdown();
+
+    }
+
+    /*
+     * Try to Get Fresh GPS Location
+     */
 
     try {
 
-    await getCurrentLocation();
-
-    updateLocationInfo();
-
-    calculatePrayerTimes();
-
-    updateHijriDate();
-
-    startCountdown();
-
-   updateLastLocationStatus();
-
-}
-catch (err) {
-
-    console.error("Location initialization error:", err);
-
-    /*
-     * Offline / location fallback
-     * Prayer calculation will continue if GPS
-     * coordinates are already available.
-     */
-
-    if (
-        STATE.latitude !== null &&
-        STATE.longitude !== null
-    ) {
+        await getCurrentLocation();
 
         updateLocationInfo();
 
@@ -168,19 +176,58 @@ catch (err) {
 
         startCountdown();
 
-    }
-    else {
+        updateLastLocationStatus();
 
-        ui.location.textContent =
-            "Location unavailable";
+    }
+
+    catch (err) {
+
+        console.error(
+            "Location initialization error:",
+            err
+        );
+
+        /*
+         * Use Last Known Location
+         */
+
+        if (hasLastLocation) {
+
+            updateLocationInfo();
+
+            calculatePrayerTimes();
+
+            updateHijriDate();
+
+            startCountdown();
+
+            updateLastLocationStatus();
+
+        }
+
+        else {
+
+            if (ui.location) {
+
+                ui.location.textContent =
+                    "Location unavailable";
+
+            }
+
+            if (ui.position) {
+
+                ui.position.textContent =
+                    "--";
+
+            }
+
+            updateLastLocationStatus();
+
+        }
 
     }
 
 }
-
-}
-
-
 
 /* ================================================
    Settings
