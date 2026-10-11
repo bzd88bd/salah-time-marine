@@ -49,10 +49,21 @@ const STATE = {
 
     prayerTimes: null,
 
-    nextPrayer: null
+    nextPrayer: null,
+
+    // GPS request management
+    gpsRequestInProgress: false,
+
+    // GPS success status
+    gpsLastSuccess: false,
+
+    // Current GPS status message
+    gpsStatusMessage: "",
+
+    // Last GPS error
+    gpsLastError: null
 
 };
-
 const ui = {
 
     location:
