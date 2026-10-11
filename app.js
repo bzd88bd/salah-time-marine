@@ -2262,16 +2262,36 @@ function setSystemStatus(element, text, good) {
    GPS / Position
 ================================================ */
 
+/* ================================================
+   GPS System Status - Version 2.2
+================================================ */
+
 function updateGPSStatus() {
 
-    if (
-        STATE.latitude !== null &&
-        STATE.longitude !== null
-    ) {
+    // GPS request is running
+    if (STATE.gpsRequestInProgress) {
 
         setSystemStatus(
             systemStatusUI.gps,
-            "🟢 Live",
+            "🟡 Requesting",
+            false
+        );
+
+        setSystemStatus(
+            systemStatusUI.position,
+            "🟡 Waiting",
+            false
+        );
+
+        return;
+    }
+
+    // GPS successfully received
+    if (STATE.gpsLastSuccess) {
+
+        setSystemStatus(
+            systemStatusUI.gps,
+            "🟢 Position received",
             true
         );
 
@@ -2281,24 +2301,43 @@ function updateGPSStatus() {
             true
         );
 
+        return;
     }
 
-    else {
+    // Saved coordinates are available, but GPS
+    // has not successfully updated the position
+    if (
+        STATE.latitude !== null &&
+        STATE.longitude !== null
+    ) {
 
         setSystemStatus(
             systemStatusUI.gps,
-            "🔴 Unavailable",
+            "🟡 Saved position",
             false
         );
 
         setSystemStatus(
             systemStatusUI.position,
-            "🔴 Not Updated",
+            "🟡 Last known",
             false
         );
 
+        return;
     }
 
+    // No GPS position available
+    setSystemStatus(
+        systemStatusUI.gps,
+        "🔴 Unavailable",
+        false
+    );
+
+    setSystemStatus(
+        systemStatusUI.position,
+        "🔴 Not updated",
+        false
+    );
 }
 
 
