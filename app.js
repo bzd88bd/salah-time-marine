@@ -270,94 +270,81 @@ function saveSettings() {
    GPS Location
 ================================================ */
 
+/* ================================================
+   GPS Location - Diagnostic Version 1.9.2
+================================================ */
+
 async function getCurrentLocation() {
+
+    console.log("GPS: Request started");
 
     return new Promise((resolve, reject) => {
 
         if (!navigator.geolocation) {
 
-            reject("Geolocation not supported");
+            console.error("GPS: Geolocation not supported");
+
+            reject(new Error("Geolocation not supported"));
 
             return;
-
         }
 
         navigator.geolocation.getCurrentPosition(
 
             async position => {
 
-                STATE.latitude =
-                    position.coords.latitude;
+                console.log("GPS: Position received");
 
-                STATE.longitude =
-                    position.coords.longitude;
-
-                updateGPSStatus();
-
+                STATE.latitude = position.coords.latitude;
+                STATE.longitude = position.coords.longitude;
 
                 STATE.timezone =
                     Intl.DateTimeFormat()
                     .resolvedOptions()
                     .timeZone;
 
-
-                /* =========================================
-                   Save Last Known GPS Location
-                ========================================= */
-
                 localStorage.setItem(
                     "lastKnownLocation",
                     JSON.stringify({
-
-                        latitude:
-                            STATE.latitude,
-
-                        longitude:
-                            STATE.longitude,
-
-                        timezone:
-                            STATE.timezone,
-
-                        savedAt:
-                            new Date().toISOString()
-
+                        latitude: STATE.latitude,
+                        longitude: STATE.longitude,
+                        timezone: STATE.timezone,
+                        savedAt: new Date().toISOString()
                     })
                 );
 
+                updateGPSStatus();
 
-                /* =========================================
-                   Reverse Geocoding
-                   Optional - Internet required
-                ========================================= */
+                // Update the displayed coordinates immediately.
+                updateLocationInfo();
 
-                // Reverse geocoding runs in the background.
-Promise.resolve()
-    .then(() => reverseGeocode())
-    .catch(error => {
-        console.warn(
-            "Reverse geocoding unavailable. Using GPS only.",
-            error
-        );
-    });
+                // Resolve GPS first; geocoding runs separately.
+                resolve();
 
-resolve();
+                reverseGeocode()
+                    .then(() => updateLocationInfo())
+                    .catch(error => {
+                        console.warn("Reverse geocoding failed:", error);
+                    });
 
             },
 
             error => {
+
+                console.error(
+                    "GPS error:",
+                    error.code,
+                    error.message
+                );
 
                 reject(error);
 
             },
 
             {
-
                 enableHighAccuracy: true,
-
-                timeout: 15000,
-
-                maximumAge: 300000
-
+                timeout: 20000,
+                maximumAge: 0
             }
 
         );
@@ -365,8 +352,6 @@ resolve();
     });
 
 }
-
-
 /* ================================================
    Last Known Location
 ================================================ */
