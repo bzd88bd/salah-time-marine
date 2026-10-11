@@ -1171,29 +1171,29 @@ function findNextPrayer() {
    Update Next Prayer Name and Time
 ================================================ */
 
+/* ================================================
+   Update Next Prayer Card
+   Version 2.3
+================================================ */
+
 function updateNextPrayer() {
 
     if (!STATE.nextPrayer) return;
 
-    // Update prayer name
+    // Update next prayer name
     if (ui.nextPrayer) {
-
         ui.nextPrayer.textContent =
             STATE.nextPrayer.name;
-
     }
 
-    // Update prayer time
+    // Update next prayer time
     const prayerTimeElement =
         document.getElementById("nextPrayerTime");
 
     if (prayerTimeElement && STATE.nextPrayer.time) {
-
         prayerTimeElement.textContent =
             formatTime(STATE.nextPrayer.time);
-
     }
-
 }
 
 
