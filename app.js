@@ -1290,100 +1290,87 @@ function updateHijriDate() {
    Refresh Location - GPS Diagnostic
 ================================================ */
 
-const refreshButton = document.getElementById("refreshLocation");
+/* ================================================
+   Refresh Location - Version 2.2
+================================================ */
+
+const refreshButton =
+    document.getElementById("refreshLocation");
 
 if (refreshButton) {
-    refreshButton.addEventListener("click", async function () {
 
-        const statusElement = document.getElementById("lastLocationStatus");
+    refreshButton.addEventListener("click", async () => {
 
-        function showStatus(message) {
-            if (statusElement) {
-                statusElement.textContent = message;
-            }
+        // Prevent repeated clicks during a GPS request
+        if (STATE.gpsRequestInProgress) {
+            return;
         }
+
+        const originalText = refreshButton.textContent;
 
         refreshButton.disabled = true;
         refreshButton.textContent = "Locating...";
 
-        showStatus("STEP 1: Refresh button clicked");
-
         try {
-            showStatus("STEP 2: Checking GPS support...");
 
-            if (!navigator.geolocation) {
-                throw new Error("Geolocation is not supported");
-            }
+            // Request a fresh GPS position
+            await getCurrentLocation();
 
-            showStatus("STEP 3: Waiting for GPS response...");
-
-            const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(
-                    resolve,
-                    reject,
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 25000,
-                        maximumAge: 0
-                    }
-                );
-            });
-
-            STATE.latitude = position.coords.latitude;
-            STATE.longitude = position.coords.longitude;
-            STATE.timezone =
-                Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-            localStorage.setItem(
-                "lastKnownLocation",
-                JSON.stringify({
-                    latitude: STATE.latitude,
-                    longitude: STATE.longitude,
-                    timezone: STATE.timezone,
-                    savedAt: new Date().toISOString()
-                })
-            );
-
+            // Update location-dependent information
             updateLocationInfo();
             calculatePrayerTimes();
             updateHijriDate();
-            updateGPSStatus();
-            updateLastLocationStatus();
+            updateCalculationInfo();
 
-            showStatus(
-                "GPS SUCCESS: " +
-                position.coords.latitude.toFixed(5) +
-                ", " +
-                position.coords.longitude.toFixed(5)
-            );
-
-            if (typeof reverseGeocode === "function") {
-                reverseGeocode()
-                    .then(() => updateLocationInfo())
-                    .catch(error => console.warn(error));
+            if (typeof updateQibla === "function") {
+                updateQibla();
             }
+
+            updateLastLocationStatus();
+            updateGPSStatus();
 
         } catch (error) {
-            console.error("GPS diagnostic error:", error);
 
-            if (error.code === 1) {
-                showStatus("GPS ERROR: Permission denied");
-            } else if (error.code === 2) {
-                showStatus("GPS ERROR: Position unavailable");
-            } else if (error.code === 3) {
-                showStatus("GPS ERROR: Request timed out");
+            console.warn(
+                "Refresh location failed:",
+                error
+            );
+
+            // Continue using the saved position if available
+            const hasLastLocation =
+                loadLastKnownLocation();
+
+            if (
+                hasLastLocation &&
+                STATE.latitude !== null &&
+                STATE.longitude !== null
+            ) {
+
+                updateLocationInfo();
+                calculatePrayerTimes();
+                updateHijriDate();
+                updateCalculationInfo();
+
+                if (typeof updateQibla === "function") {
+                    updateQibla();
+                }
+
+                updateGPSStatus();
+
             } else {
-                showStatus("GPS ERROR: " + error.message);
+
+                updateGPSStatus();
             }
 
+            // Preserve the GPS error message
+            updateLastLocationStatus();
+
         } finally {
+
             refreshButton.disabled = false;
-            refreshButton.textContent = "Refresh Location";
+            refreshButton.textContent = originalText;
         }
     });
-
-} else {
-    console.error("GPS ERROR: refreshLocation button not found");
 }
 /* ================================================
    Version 1.3 - Settings
