@@ -278,15 +278,21 @@ function saveSettings() {
    GPS Location - On-Screen Diagnostics
 ================================================ */
 
+/* ================================================
+   GPS Location - Version 1.9.3
+================================================ */
+
 async function getCurrentLocation() {
 
     const statusElement =
         document.getElementById("lastLocationStatus");
 
     function showGPSStatus(message) {
+
         if (statusElement) {
             statusElement.textContent = message;
         }
+
     }
 
     console.log("GPS: Request started");
@@ -297,24 +303,29 @@ async function getCurrentLocation() {
 
         if (!navigator.geolocation) {
 
-            const error =
-                new Error("Geolocation not supported");
+            const error = new Error(
+                "Geolocation is not supported by this browser."
+            );
 
-            console.error(error);
-
-            showGPSStatus("🔴 GPS not supported by browser");
+            showGPSStatus("🔴 GPS not supported");
 
             reject(error);
 
             return;
+
         }
 
         navigator.geolocation.getCurrentPosition(
 
             position => {
 
-                console.log("GPS: Position received");
+                console.log(
+                    "GPS: Position received",
+                    position.coords.latitude,
+                    position.coords.longitude
+                );
 
+                // Save current GPS coordinates
                 STATE.latitude =
                     position.coords.latitude;
 
@@ -326,28 +337,39 @@ async function getCurrentLocation() {
                     .resolvedOptions()
                     .timeZone;
 
+                // Save the latest GPS position
                 localStorage.setItem(
                     "lastKnownLocation",
                     JSON.stringify({
+
                         latitude: STATE.latitude,
+
                         longitude: STATE.longitude,
+
                         timezone: STATE.timezone,
+
                         savedAt: new Date().toISOString()
+
                     })
                 );
 
+                // Update displayed coordinates and GPS status
                 updateGPSStatus();
 
                 updateLocationInfo();
 
-                showGPSStatus("🟢 GPS position received");
+                showGPSStatus(
+                    "🟢 GPS position received"
+                );
 
-                // Finish GPS initialization immediately.
-                resolve();
+                // Resolve immediately after receiving GPS
+                resolve(position);
 
-                // Resolve the location name separately.
+                // Find the location name separately
                 reverseGeocode()
-                    .then(() => updateLocationInfo())
+                    .then(() => {
+                        updateLocationInfo();
+                    })
                     .catch(error => {
                         console.warn(
                             "Reverse geocoding failed:",
@@ -365,30 +387,29 @@ async function getCurrentLocation() {
                     error.message
                 );
 
-                switch (error.code) {
+                if (error.code === 1) {
 
-                    case 1:
-                        showGPSStatus(
-                            "🔴 GPS permission denied"
-                        );
-                        break;
+                    showGPSStatus(
+                        "🔴 GPS permission denied"
+                    );
 
-                    case 2:
-                        showGPSStatus(
-                            "🔴 GPS position unavailable"
-                        );
-                        break;
+                } else if (error.code === 2) {
 
-                    case 3:
-                        showGPSStatus(
-                            "🟡 GPS request timed out"
-                        );
-                        break;
+                    showGPSStatus(
+                        "🔴 GPS position unavailable"
+                    );
 
-                    default:
-                        showGPSStatus(
-                            "🔴 GPS error: " + error.message
-                        );
+                } else if (error.code === 3) {
+
+                    showGPSStatus(
+                        "🟡 GPS request timed out"
+                    );
+
+                } else {
+
+                    showGPSStatus(
+                        "🔴 GPS error"
+                    );
 
                 }
 
