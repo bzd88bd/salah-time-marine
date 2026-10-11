@@ -274,29 +274,52 @@ function saveSettings() {
    GPS Location - Diagnostic Version 1.9.2
 ================================================ */
 
+/* ================================================
+   GPS Location - On-Screen Diagnostics
+================================================ */
+
 async function getCurrentLocation() {
 
+    const statusElement =
+        document.getElementById("lastLocationStatus");
+
+    function showGPSStatus(message) {
+        if (statusElement) {
+            statusElement.textContent = message;
+        }
+    }
+
     console.log("GPS: Request started");
+
+    showGPSStatus("📡 Requesting GPS location...");
 
     return new Promise((resolve, reject) => {
 
         if (!navigator.geolocation) {
 
-            console.error("GPS: Geolocation not supported");
+            const error =
+                new Error("Geolocation not supported");
 
-            reject(new Error("Geolocation not supported"));
+            console.error(error);
+
+            showGPSStatus("🔴 GPS not supported by browser");
+
+            reject(error);
 
             return;
         }
 
         navigator.geolocation.getCurrentPosition(
 
-            async position => {
+            position => {
 
                 console.log("GPS: Position received");
 
-                STATE.latitude = position.coords.latitude;
-                STATE.longitude = position.coords.longitude;
+                STATE.latitude =
+                    position.coords.latitude;
+
+                STATE.longitude =
+                    position.coords.longitude;
 
                 STATE.timezone =
                     Intl.DateTimeFormat()
@@ -315,16 +338,21 @@ async function getCurrentLocation() {
 
                 updateGPSStatus();
 
-                // Update the displayed coordinates immediately.
                 updateLocationInfo();
 
-                // Resolve GPS first; geocoding runs separately.
+                showGPSStatus("🟢 GPS position received");
+
+                // Finish GPS initialization immediately.
                 resolve();
 
+                // Resolve the location name separately.
                 reverseGeocode()
                     .then(() => updateLocationInfo())
                     .catch(error => {
-                        console.warn("Reverse geocoding failed:", error);
+                        console.warn(
+                            "Reverse geocoding failed:",
+                            error
+                        );
                     });
 
             },
@@ -336,6 +364,33 @@ async function getCurrentLocation() {
                     error.code,
                     error.message
                 );
+
+                switch (error.code) {
+
+                    case 1:
+                        showGPSStatus(
+                            "🔴 GPS permission denied"
+                        );
+                        break;
+
+                    case 2:
+                        showGPSStatus(
+                            "🔴 GPS position unavailable"
+                        );
+                        break;
+
+                    case 3:
+                        showGPSStatus(
+                            "🟡 GPS request timed out"
+                        );
+                        break;
+
+                    default:
+                        showGPSStatus(
+                            "🔴 GPS error: " + error.message
+                        );
+
+                }
 
                 reject(error);
 
