@@ -713,4 +713,41 @@ button:focus{
 
 
 
+/* Next Prayer Layout */
+.prayer-info-row,
+.remaining-time-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.prayer-info-row {
+    margin-top: 15px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.remaining-time-row {
+    margin-top: 18px;
+    font-size: 16px;
+}
+
+#nextPrayerTime,
+#countdown {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+#countdown {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+
+
+
 
