@@ -1010,52 +1010,107 @@ function updateShipTime() {
    Prayer Table
 ================================================ */
 
+/* ================================================
+   Prayer Table and Prohibited Prayer Times
+================================================ */
+
 function updatePrayerTable() {
 
     if (!STATE.prayerTimes) return;
 
+    const times = STATE.prayerTimes;
 
-    ui.fajr.textContent =
+    // Display regular prayer times
+    if (ui.fajr) {
+        ui.fajr.textContent = formatTime(times.fajr);
+    }
 
-        formatTime(
-            STATE.prayerTimes.fajr
-        );
+    if (ui.sunrise) {
+        ui.sunrise.textContent = formatTime(times.sunrise);
+    }
 
+    if (ui.dhuhr) {
+        ui.dhuhr.textContent = formatTime(times.dhuhr);
+    }
 
-    ui.sunrise.textContent =
+    if (ui.asr) {
+        ui.asr.textContent = formatTime(times.asr);
+    }
 
-        formatTime(
-            STATE.prayerTimes.sunrise
-        );
+    if (ui.maghrib) {
+        ui.maghrib.textContent = formatTime(times.maghrib);
+    }
 
+    if (ui.isha) {
+        ui.isha.textContent = formatTime(times.isha);
+    }
 
-    ui.dhuhr.textContent =
+    /*
+     * Sunset
+     *
+     * Maghrib adjustment is removed to estimate
+     * the astronomical sunset time.
+     */
 
-        formatTime(
-            STATE.prayerTimes.dhuhr
-        );
+    const maghribAdjustment =
+        Number(APP.prayerAdjustment?.maghrib || 0);
 
+    const sunsetTime = new Date(
+        times.maghrib.getTime() -
+        maghribAdjustment * 60000
+    );
 
-    ui.asr.textContent =
+    if (ui.sunset) {
+        ui.sunset.textContent = formatTime(sunsetTime);
+    }
 
-        formatTime(
-            STATE.prayerTimes.asr
-        );
+    /*
+     * Sunrise prohibition
+     * Approximate precaution: sunrise to +15 minutes
+     */
 
+    const sunriseStart = new Date(times.sunrise);
 
-    ui.maghrib.textContent =
+    const sunriseEnd = new Date(
+        sunriseStart.getTime() + 15 * 60000
+    );
 
-        formatTime(
-            STATE.prayerTimes.maghrib
-        );
+    if (ui.sunriseProhibited) {
+        ui.sunriseProhibited.textContent =
+            `${formatTime(sunriseStart)} – ${formatTime(sunriseEnd)}`;
+    }
 
+    /*
+     * Zawal precaution
+     * Approximate window: 5 minutes before Dhuhr
+     * until Dhuhr begins.
+     */
 
-    ui.isha.textContent =
+    const zawalEnd = new Date(times.dhuhr);
 
-        formatTime(
-            STATE.prayerTimes.isha
-        );
+    const zawalStart = new Date(
+        zawalEnd.getTime() - 5 * 60000
+    );
 
+    if (ui.zawalProhibited) {
+        ui.zawalProhibited.textContent =
+            `${formatTime(zawalStart)} – ${formatTime(zawalEnd)}`;
+    }
+
+    /*
+     * Sunset precaution
+     * Display an approximate 15-minute precautionary
+     * window ending at sunset.
+     */
+
+    const sunsetStart = new Date(
+        sunsetTime.getTime() - 15 * 60000
+    );
+
+    if (ui.sunsetProhibited) {
+        ui.sunsetProhibited.textContent =
+            `${formatTime(sunsetStart)} – ${formatTime(sunsetTime)}`;
+    }
 
 }
 
