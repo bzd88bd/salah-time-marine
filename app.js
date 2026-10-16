@@ -754,21 +754,28 @@ async function reverseGeocode() {
    Update Location - GPS Aware Position Label
 ================================================ */
 
+/* =========================================
+   Update Location Information
+   Version 1.6
+========================================= */
+
 function updateLocationInfo() {
 
     const positionLabel =
         document.getElementById("positionLabel");
 
     const hasPosition =
-        STATE.latitude !== null &&
-        STATE.longitude !== null;
+        Number.isFinite(STATE.latitude) &&
+        Number.isFinite(STATE.longitude);
 
-    // Change the position label based on GPS status
+    const gpsAvailable =
+        STATE.gpsLastSuccess === true;
+
+    // Update position label
     if (positionLabel) {
-        positionLabel.textContent =
-            STATE.gpsLastSuccess
-                ? "Current Position"
-                : "Last Received Position";
+        positionLabel.textContent = gpsAvailable
+            ? "📍 Current Position"
+            : "📍 Last Received Position";
     }
 
     // Display coordinates
@@ -778,24 +785,25 @@ function updateLocationInfo() {
                 `${STATE.latitude.toFixed(4)}, ` +
                 `${STATE.longitude.toFixed(4)}`;
         } else {
-            ui.position.textContent = "--";
+            ui.position.textContent =
+                "Position unavailable";
         }
     }
 
     // Display nearest location
-    if (STATE.city && STATE.country) {
-        ui.location.textContent =
-            `${STATE.city}, ${STATE.country}`;
-    } else if (STATE.city) {
-        ui.location.textContent = STATE.city;
-    } else if (STATE.country) {
-        ui.location.textContent = STATE.country;
-    } else {
-        ui.location.textContent = "Offshore Area";
+    if (ui.location) {
+        if (STATE.city && STATE.country) {
+            ui.location.textContent =
+                `${STATE.city}, ${STATE.country}`;
+        } else if (STATE.city) {
+            ui.location.textContent = STATE.city;
+        } else if (STATE.country) {
+            ui.location.textContent = STATE.country;
+        } else {
+            ui.location.textContent = "Location unknown";
+        }
     }
 }
-
-
 /* ================================================
    Calculation Method
 ================================================ */
