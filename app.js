@@ -68,14 +68,15 @@ const ui = {
 
     location:
         document.getElementById("location"),
-   position:
-    document.getElementById("position"),
 
-localTime:
-    document.getElementById("localTime"),
+    position:
+        document.getElementById("position"),
 
-timeZone:
-    document.getElementById("timeZone"),
+    localTime:
+        document.getElementById("localTime"),
+
+    timeZone:
+        document.getElementById("timeZone"),
 
     todayDate:
         document.getElementById("todayDate"),
@@ -98,11 +99,23 @@ timeZone:
     asr:
         document.getElementById("asr"),
 
+    sunset:
+        document.getElementById("sunset"),
+
     maghrib:
         document.getElementById("maghrib"),
 
     isha:
         document.getElementById("isha"),
+
+    sunriseProhibited:
+        document.getElementById("sunriseProhibited"),
+
+    zawalProhibited:
+        document.getElementById("zawalProhibited"),
+
+    sunsetProhibited:
+        document.getElementById("sunsetProhibited"),
 
     hijri:
         document.getElementById("hijriDate"),
@@ -113,12 +126,7 @@ timeZone:
     asrMethod:
         document.getElementById("asrMethod")
 
-   sunset: document.getElementById("sunset"),
-sunriseProhibited: document.getElementById("sunriseProhibited"),
-zawalProhibited: document.getElementById("zawalProhibited"),
-sunsetProhibited: document.getElementById("sunsetProhibited"),
 };
-
 window.addEventListener("load", () => {
 
     initializeApp();
