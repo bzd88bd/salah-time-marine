@@ -1127,6 +1127,25 @@ function findNextPrayer() {
 
     if (!STATE.prayerTimes) return;
 
+console.log(
+    "Fajr raw time:",
+    STATE.prayerTimes.fajr.toString()
+);
+
+console.log(
+    "Fajr formatted time:",
+    formatTime(STATE.prayerTimes.fajr)
+);
+
+console.log(
+    "Next Prayer raw time:",
+    STATE.nextPrayer?.time?.toString()
+);
+
+
+   
+
+   
     const now = new Date();
 
     const prayers = [
