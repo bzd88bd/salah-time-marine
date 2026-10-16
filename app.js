@@ -750,60 +750,50 @@ async function reverseGeocode() {
    Update Location
 ================================================ */
 
+/* ================================================
+   Update Location - GPS Aware Position Label
+================================================ */
+
 function updateLocationInfo() {
 
-    /*
-     * Current Position
-     */
+    const positionLabel =
+        document.getElementById("positionLabel");
 
-    if (
-        ui.position &&
+    const hasPosition =
         STATE.latitude !== null &&
-        STATE.longitude !== null
-    ) {
+        STATE.longitude !== null;
 
-        ui.position.textContent =
-            `${STATE.latitude.toFixed(4)}, ` +
-            `${STATE.longitude.toFixed(4)}`;
-
+    // Change the position label based on GPS status
+    if (positionLabel) {
+        positionLabel.textContent =
+            STATE.gpsLastSuccess
+                ? "Current Position"
+                : "Last Received Position";
     }
 
+    // Display coordinates
+    if (ui.position) {
+        if (hasPosition) {
+            ui.position.textContent =
+                `${STATE.latitude.toFixed(4)}, ` +
+                `${STATE.longitude.toFixed(4)}`;
+        } else {
+            ui.position.textContent = "--";
+        }
+    }
 
-    /*
-     * Nearest Location
-     */
-
+    // Display nearest location
     if (STATE.city && STATE.country) {
-
         ui.location.textContent =
             `${STATE.city}, ${STATE.country}`;
-
+    } else if (STATE.city) {
+        ui.location.textContent = STATE.city;
+    } else if (STATE.country) {
+        ui.location.textContent = STATE.country;
+    } else {
+        ui.location.textContent = "Offshore Area";
     }
-
-    else if (STATE.city) {
-
-        ui.location.textContent =
-            STATE.city;
-
-    }
-
-    else if (STATE.country) {
-
-        ui.location.textContent =
-            STATE.country;
-
-    }
-
-    else {
-
-        ui.location.textContent =
-            "Offshore Area";
-
-    }
-
 }
-
-
 
 
 /* ================================================
