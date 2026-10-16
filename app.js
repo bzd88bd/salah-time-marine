@@ -1124,119 +1124,70 @@ function updatePrayerTable() {
 ================================================ */
 
 function findNextPrayer() {
-
     if (!STATE.prayerTimes) return;
 
-console.log(
-    "Fajr raw time:",
-    STATE.prayerTimes.fajr.toString()
-);
-
-console.log(
-    "Fajr formatted time:",
-    formatTime(STATE.prayerTimes.fajr)
-);
-
-console.log(
-    "Next Prayer raw time:",
-    STATE.nextPrayer?.time?.toString()
-);
-
-
-   
-
-   
     const now = new Date();
+    const times = STATE.prayerTimes;
 
     const prayers = [
-        {
-            name: "Fajr",
-            time: STATE.prayerTimes.fajr
-        },
-        {
-            name: "Sunrise",
-            time: STATE.prayerTimes.sunrise
-        },
-        {
-            name: "Dhuhr",
-            time: STATE.prayerTimes.dhuhr
-        },
-        {
-            name: "Asr",
-            time: STATE.prayerTimes.asr
-        },
-        {
-            name: "Maghrib",
-            time: STATE.prayerTimes.maghrib
-        },
-        {
-            name: "Isha",
-            time: STATE.prayerTimes.isha
-        }
+        { name: "Fajr", time: times.fajr },
+        { name: "Sunrise", time: times.sunrise },
+        { name: "Dhuhr", time: times.dhuhr },
+        { name: "Asr", time: times.asr },
+        { name: "Maghrib", time: times.maghrib },
+        { name: "Isha", time: times.isha }
     ];
 
-    // Find the next upcoming time
+    // Find the next prayer for today
     for (const prayer of prayers) {
-
-        if (now < prayer.time) {
-
+        if (prayer.time > now) {
             STATE.nextPrayer = {
                 name: prayer.name,
-                time: prayer.time
+                time: prayer.time,
+                dayLabel: "Today"
             };
 
             updateNextPrayer();
             updateCountdown();
-
             return;
         }
     }
 
-    // Calculate tomorrow's Fajr
+    // All today's prayers have passed.
+    // Calculate tomorrow's Fajr.
     const tomorrow = new Date();
-
-    tomorrow.setDate(
-        tomorrow.getDate() + 1
-    );
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
     const coordinates = new adhan.Coordinates(
         STATE.latitude,
         STATE.longitude
     );
 
-    const tomorrowPrayer = new adhan.PrayerTimes(
+    const tomorrowPrayerTimes = new adhan.PrayerTimes(
         coordinates,
         tomorrow,
         createCalculationParameters()
     );
 
+    let tomorrowFajr = new Date(tomorrowPrayerTimes.fajr);
+
     const fajrAdjustment = Number(
         APP.prayerAdjustment?.fajr || 0
     );
 
-    const tomorrowFajr = new Date(
-        tomorrowPrayer.fajr.getTime() +
-        fajrAdjustment * 60000
+    tomorrowFajr = new Date(
+        tomorrowFajr.getTime() + fajrAdjustment * 60000
     );
 
     STATE.nextPrayer = {
         name: "Fajr",
-        time: tomorrowFajr
+        time: tomorrowFajr,
+        dayLabel: "Tomorrow"
     };
 
     updateNextPrayer();
     updateCountdown();
 }
-
-/* ================================================
-   Update Next Prayer Name and Time
-================================================ */
-
-/* ================================================
-   Update Next Prayer Card
-   Version 2.3
-================================================ */
-
 /* ================================================
    Update Next Prayer Card
    Version 2.4
