@@ -1243,26 +1243,34 @@ function findNextPrayer() {
    Version 2.3
 ================================================ */
 
+/* ================================================
+   Update Next Prayer Card
+   Version 2.4
+================================================ */
+
 function updateNextPrayer() {
 
     if (!STATE.nextPrayer) return;
 
-    // Update next prayer name
+    // Display prayer name
     if (ui.nextPrayer) {
         ui.nextPrayer.textContent =
             STATE.nextPrayer.name;
     }
 
-    // Update next prayer time
+    // Display prayer time using the same formatter
     const prayerTimeElement =
         document.getElementById("nextPrayerTime");
 
-    if (prayerTimeElement && STATE.nextPrayer.time) {
+    if (
+        prayerTimeElement &&
+        STATE.nextPrayer.time instanceof Date &&
+        !isNaN(STATE.nextPrayer.time.getTime())
+    ) {
         prayerTimeElement.textContent =
             formatTime(STATE.nextPrayer.time);
     }
 }
-
 
 
 /* ================================================
