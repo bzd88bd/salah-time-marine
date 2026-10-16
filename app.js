@@ -1194,16 +1194,20 @@ function findNextPrayer() {
 ================================================ */
 
 function updateNextPrayer() {
-
     if (!STATE.nextPrayer) return;
 
-    // Display prayer name
     if (ui.nextPrayer) {
-        ui.nextPrayer.textContent =
-            STATE.nextPrayer.name;
+        const prayerName = STATE.nextPrayer.name;
+        const dayLabel = STATE.nextPrayer.dayLabel;
+
+        if (dayLabel === "Tomorrow") {
+            ui.nextPrayer.textContent =
+                `${prayerName} (Tomorrow)`;
+        } else {
+            ui.nextPrayer.textContent = prayerName;
+        }
     }
 
-    // Display prayer time using the same formatter
     const prayerTimeElement =
         document.getElementById("nextPrayerTime");
 
