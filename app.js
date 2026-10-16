@@ -113,6 +113,10 @@ timeZone:
     asrMethod:
         document.getElementById("asrMethod")
 
+   sunset: document.getElementById("sunset"),
+sunriseProhibited: document.getElementById("sunriseProhibited"),
+zawalProhibited: document.getElementById("zawalProhibited"),
+sunsetProhibited: document.getElementById("sunsetProhibited"),
 };
 
 window.addEventListener("load", () => {
